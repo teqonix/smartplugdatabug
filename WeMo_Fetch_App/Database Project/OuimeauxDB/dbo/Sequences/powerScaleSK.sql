@@ -1,0 +1,7 @@
+﻿CREATE SEQUENCE [dbo].[powerScaleSK]
+    AS BIGINT
+    INCREMENT BY 1
+    MINVALUE 1;
+
+
+
