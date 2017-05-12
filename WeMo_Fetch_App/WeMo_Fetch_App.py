@@ -1,4 +1,3 @@
-import ouimeaux
 import sqlite3
 import datetime
 import pymssql 
@@ -97,13 +96,13 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
 	                    , SerialNbr
 	                    , MAX(ModelNbr) AS ModelNbr
 	                    , MAX(FirmwareVersion) AS FirmwareVersion
-	                    , DeviceName AS DeviceName
+	                    , MIN(DeviceName) AS DeviceName
 	                    , MAX(Status) AS Status
 	                    , AVG(EnergyUse) AS EnergyUse
                         , COUNT(0) AS dataPointsAggregated
 	                    , datetime(datetime(), 'localtime') AS DataPulledDate
                 FROM switchDataPoints
-                GROUP BY DeviceName, MACAddress, SerialNbr"""
+                GROUP BY MACAddress, SerialNbr"""
     returnData = []
     for dataRow in databaseCursor.execute(tableQuery):
         #print(dataRow)
@@ -127,6 +126,116 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
     #    print(detailData)
     return returnData
 
+def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
+    for currentDataRow in currentDataSet:
+        #I hate that I've hard-coded the order of data in this function; ideally you'd pass a dictionary into this, but I'm not sure how to do that and am too tired to research how this works: http://stackoverflow.com/questions/3300464/how-can-i-get-dict-from-sqlite-query
+        print(currentDataRow[5])
+        #http://stackoverflow.com/questions/3410455/how-do-i-use-sql-parameters-with-python
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.deviceFirmware AS target
+                    USING (SELECT 
+			                    %s AS firmwareName
+	                    ) AS source (firmwareName)
+                    ON (target.firmwareName = source.firmwareName)
+                    WHEN MATCHED THEN 
+	                    UPDATE SET target.firmwareName = source.firmwareName
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (firmwareName)
+                        VALUES(source.firmwareName)
+                    OUTPUT inserted.[deviceFirmwareSK] --This will return the new or fetched SK back to the calling client (Yay!!)
+                    ;                    
+        """,currentDataRow[5])
+        currentFirmwareSK = mssqlcursor.fetchone()
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.networkMetadata AS target
+                    USING (SELECT 
+			                    %s AS ipAddress
+                                ,%s AS tcpIPversion
+	                    ) AS source (ipAddress, tcpIPversion)
+                    ON (target.ipAddress = source.ipAddress)
+                    WHEN MATCHED THEN 
+	                    UPDATE SET target.ipAddress = source.ipAddress, target.tcpIPversion = source.tcpIPversion
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (ipAddress, tcpIPversion)
+                        VALUES(source.ipAddress, source.tcpIPversion)
+                    OUTPUT inserted.[networkMetadataSK]
+                    ;                    
+        """,(currentDataRow[1],'IPv4'))
+        currentNetworkMetadataSK = mssqlcursor.fetchone()
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.deviceTypes AS target
+                    USING (SELECT 
+			                    %s AS deviceTypeLabel
+	                    ) AS source (deviceTypeLabel)
+                    ON (target.deviceTypeLabel = source.deviceTypeLabel)
+                    WHEN MATCHED THEN 
+	                    UPDATE SET target.deviceTypeLabel= source.deviceTypeLabel
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (deviceTypeLabel)
+                        VALUES(source.deviceTypeLabel)
+                    OUTPUT inserted.[deviceTypeSK]
+                    ;                    
+        """,(currentDataRow[4]))
+        currentDeviceTypeSK = mssqlcursor.fetchone()
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.IoTDevice AS target
+                    USING (SELECT 
+			                    %s AS macAddress
+                                ,%s AS serialNumber
+                                ,%s AS friendlyName
+                                ,%s AS deviceTypeFK
+                                ,%s AS deviceFirmwareFK
+                                ,%s AS deviceIPAddressFK
+                                ,0 AS retiredDevice --If this merge statment is being called from the python app, then obviously the device is active
+	                    ) AS source (
+			                   macAddress
+                               ,serialNumber
+                               ,friendlyName
+                               ,deviceTypeFK
+                               ,deviceFirmwareFK
+                               ,deviceIPAddressFK
+                               ,retiredDevice
+                       )
+                    ON (
+                        target.macAddress = source.macAddress 
+                        AND target.serialNumber = source.serialNumber
+                    )
+                    WHEN MATCHED THEN 
+	                    UPDATE SET 
+                            target.macAddress = source.macAddress
+                            , target.serialNumber = source.serialNumber
+                            , target.friendlyName = source.friendlyName
+                            , target.deviceTypeFK = source.deviceTypeFK
+                            , target.deviceFirmwareFK = source.deviceFirmwareFK
+                            , target.deviceIPAddressFK = source.deviceIPAddressFK
+                            , target.retiredDevice = source.retiredDevice
+                            , target.deviceChangedDate = getdate()
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (
+			                   macAddress
+                               ,serialNumber
+                               ,friendlyName
+                               ,deviceTypeFK
+                               ,deviceFirmwareFK
+                               ,deviceIPAddressFK
+                               ,retiredDevice
+                               ,deviceChangedDate
+                        )
+                        VALUES(
+                            source.macAddress
+                            , source.serialNumber
+                            , source.friendlyName
+                            , source.deviceTypeFK
+                            , source.deviceFirmwareFK
+                            , source.deviceIPAddressFK
+                            , source.retiredDevice
+                            , getDate()
+                        )
+                    OUTPUT inserted.[deviceSK]
+                    ;                    
+        """,(currentDataRow[0],currentDataRow[3],currentDataRow[6],currentDeviceTypeSK,currentFirmwareSK,currentNetworkMetadataSK))
+        currentDeviceSK = mssqlcursor.fetchone()
+        mssqldb.commit()
 
 
 if __name__ == "__main__":
@@ -140,25 +249,27 @@ if __name__ == "__main__":
 try:
     cur = db.cursor()
     init_db(cur)
+
+    cur.execute("select 947128723 as this_is_a_test_dict")
+
+
     env.start()
-    nbrLoopsBeforeRediscovery = 10
+    numSecondsForDiscovery = 2
     numMinutesToGatherData = 0.10
-    fetchDataDelaySeconds = 2
+    fetchDataDelaySeconds = 0.5
     server="10.0.60.25"
     username="ouimeaux"
-    password=""
+    password="Gj37fAGje_@"
     mssqldatabase="Sandbox"
 
     #Connect to the MS SQL Server instance the database application is stored:
     mssqldb = pymssql.connect(server, username, password, "tempdb")
     mssqlcursor = mssqldb.cursor()
 
-
-
-    currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=5,numMinutesToGatherData=1,fetchDataDelaySeconds=3,databaseCursor=cur)
+    currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
     print(currentDataSet)
 
-    
+    InsertOrUpdateDatabase(mssqldb,mssqlcursor,currentDataSet)
 
     input("Press Enter to continue...")
 
