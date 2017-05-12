@@ -2,6 +2,7 @@ import ouimeaux
 import sqlite3
 import datetime
 import pymssql 
+
 from ouimeaux.environment import Environment
 
 #We will use an in-memory database & table to store and aggregate our data we've pulled from our WeMo devices
@@ -143,9 +144,21 @@ try:
     nbrLoopsBeforeRediscovery = 10
     numMinutesToGatherData = 0.10
     fetchDataDelaySeconds = 2
+    server="10.0.60.25"
+    username="ouimeaux"
+    password=""
+    mssqldatabase="Sandbox"
+
+    #Connect to the MS SQL Server instance the database application is stored:
+    mssqldb = pymssql.connect(server, username, password, "tempdb")
+    mssqlcursor = mssqldb.cursor()
+
+
 
     currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=5,numMinutesToGatherData=1,fetchDataDelaySeconds=3,databaseCursor=cur)
     print(currentDataSet)
+
+    
 
     input("Press Enter to continue...")
 
