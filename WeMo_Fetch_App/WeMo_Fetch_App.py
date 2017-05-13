@@ -129,8 +129,8 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
 def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
     for currentDataRow in currentDataSet:
         #I hate that I've hard-coded the order of data in this function; ideally you'd pass a dictionary into this, but I'm not sure how to do that and am too tired to research how this works: http://stackoverflow.com/questions/3300464/how-can-i-get-dict-from-sqlite-query
-        print(currentDataRow[5])
-        #http://stackoverflow.com/questions/3410455/how-do-i-use-sql-parameters-with-python
+        #print(currentDataRow[5])
+        #First, we need to fill the lookup tables before we can start filling the tables with FK's to the lookups:
         mssqlcursor.execute("""
                     MERGE INTO Sandbox.dbo.deviceFirmware AS target
                     USING (SELECT 
@@ -144,7 +144,7 @@ def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
                         VALUES(source.firmwareName)
                     OUTPUT inserted.[deviceFirmwareSK] --This will return the new or fetched SK back to the calling client (Yay!!)
                     ;                    
-        """,currentDataRow[5])
+        """,currentDataRow[5]) #http://stackoverflow.com/questions/3410455/how-do-i-use-sql-parameters-with-python
         currentFirmwareSK = mssqlcursor.fetchone()
         mssqlcursor.execute("""
                     MERGE INTO Sandbox.dbo.networkMetadata AS target
@@ -177,6 +177,7 @@ def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
                     ;                    
         """,(currentDataRow[4]))
         currentDeviceTypeSK = mssqlcursor.fetchone()
+        #Now that we have the SK's for our lookups, upsert into the IoTDevice table:
         mssqlcursor.execute("""
                     MERGE INTO Sandbox.dbo.IoTDevice AS target
                     USING (SELECT 
@@ -235,6 +236,65 @@ def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
                     ;                    
         """,(currentDataRow[0],currentDataRow[3],currentDataRow[6],currentDeviceTypeSK,currentFirmwareSK,currentNetworkMetadataSK))
         currentDeviceSK = mssqlcursor.fetchone()
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.powerScales AS target
+                    USING (SELECT 
+			                    %s AS unitOfPower 
+	                    ) AS source (unitOfPower)
+                    ON (target.unitOfPower = source.unitOfPower)
+                    WHEN MATCHED THEN 
+	                    UPDATE SET target.unitOfPower = source.unitOfPower
+                                   ,target.scaleChangedDate = getdate()
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (unitOfPower, scaleAddedDate)
+                        VALUES(source.unitOfPower, getdate())
+                    OUTPUT inserted.powerScaleSK
+                    ;                    
+        """,('Milliwatt'))
+        currentPowerScaleSK = mssqlcursor.fetchone()
+        mssqlcursor.execute("""
+                    MERGE INTO Sandbox.dbo.statusList AS target
+                    USING (SELECT 
+			                    %s AS statusNumberRepresentation
+                                ,%s AS sourceSystem
+	                    ) AS source (statusNumberRepresentation, sourceSystem)
+                    ON (
+                        target.statusNumberRepresentation = source.statusNumberRepresentation
+                        AND target.sourceSystem = source.sourceSystem
+                    )
+                    WHEN MATCHED THEN 
+	                    UPDATE SET target.statusNumberRepresentation = source.statusNumberRepresentation
+                                   ,target.sourceSystem = source.sourceSystem
+                                   ,target.statusChangedDate = getdate()
+                    WHEN NOT MATCHED THEN 
+	                    INSERT (statusNumberRepresentation, sourceSystem, statusAddedDate)
+                        VALUES(source.statusNumberRepresentation, source.sourceSystem, getdate())
+                    OUTPUT inserted.statusSK
+                    ;                    
+        """,(currentDataRow[7],'OuimeauxPython'))
+        currentstatusSK = mssqlcursor.fetchone()
+        #Now that we've filled all the lookup tables for the device itself, we can store the usage data for that device (after ensuring that 
+        mssqlcursor.execute("""
+                            INSERT INTO Sandbox.dbo.deviceUsageData (
+				                             deviceFK
+				                             ,deviceSignalStrength
+				                             ,deviceStateFK
+				                             ,devicePowerUsage
+				                             ,devicePowerScaleFK
+				                             ,dataPointSampleSize
+				                             ,dataPointAddedDate
+	                            )
+                            VALUES(
+		                             %s 
+		                            ,%s
+		                            ,%s
+		                            ,%s
+		                            ,%s
+		                            ,%s
+                                    ,getdate()
+                            )
+                            ;           
+        """,(currentDeviceSK, currentDataRow[2], currentstatusSK, currentDataRow[8], currentPowerScaleSK, currentDataRow[9]))
         mssqldb.commit()
 
 
@@ -254,9 +314,9 @@ try:
 
 
     env.start()
-    numSecondsForDiscovery = 2
-    numMinutesToGatherData = 0.10
-    fetchDataDelaySeconds = 0.5
+    numSecondsForDiscovery = 8
+    numMinutesToGatherData = 1
+    fetchDataDelaySeconds = 10
     server="10.0.60.25"
     username="ouimeaux"
     password="Gj37fAGje_@"
@@ -266,10 +326,10 @@ try:
     mssqldb = pymssql.connect(server, username, password, "tempdb")
     mssqlcursor = mssqldb.cursor()
 
-    currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
-    print(currentDataSet)
-
-    InsertOrUpdateDatabase(mssqldb,mssqlcursor,currentDataSet)
+    while(1==1):
+        currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
+        print(currentDataSet)
+        InsertOrUpdateDatabase(mssqldb,mssqlcursor,currentDataSet)
 
     input("Press Enter to continue...")
 
