@@ -61,6 +61,7 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="Security\" />
     <Folder Include="dbo\Sequences\" />
+    <Folder Include="dbo\Views\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\statusList.sql" />
@@ -79,5 +80,9 @@
     <Build Include="dbo\Sequences\deviceTypeSK.sql" />
     <Build Include="dbo\Sequences\deviceSK.sql" />
     <Build Include="dbo\Sequences\deviceFirmwareSK.sql" />
+    <Build Include="dbo\Tables\locations.sql" />
+    <Build Include="dbo\Views\WeMoDenormalizedReport_OLTP.sql" />
+    <Build Include="Security\wemoReporter.sql" />
+    <Build Include="dbo\Sequences\locationSK.sql" />
   </ItemGroup>
 </Project>
