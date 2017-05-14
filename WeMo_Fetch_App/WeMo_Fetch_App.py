@@ -35,9 +35,11 @@ def getDeviceHardwareIDs(Environment):
         deviceHardwareData.append([switchMAC, switchUDNlowercase, switchFirmwareVersion, switchIPAddress, switchSerialNumber, switchModelNbr])
     return deviceHardwareData
 
-def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherData, fetchDataDelaySeconds, databaseCursor):
+def aggregateDeviceData(numSecondsForDiscovery, numMinutesToGatherData, fetchDataDelaySeconds, databaseCursor):
+    env = Environment()
+    env.start()    
     databaseCursor.execute('DELETE FROM switchDataPoints') #Remove any existing data from this table, as it should`ve already been stored elsewhere
-    Environment.discover(numSecondsForDiscovery)
+    env.discover(numSecondsForDiscovery)
     #print(Environment.list_switches()) #DEBUG: See what devices we grabbed during discovery
     switchPowerDataArray = [] #We will store a list of power measurements in this list and then average them before sending them to a flat file or database (we don`t need 300 measurements per minute stored in the database; it should be flattened out)
     switchPowerDataArray.clear()
@@ -47,8 +49,8 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
     currentLoopIteration = 0 #We will only gather the switch hardware / firmware details at the first iteration of fetching power data; no need to get it multiple times during execution
     deviceHardwareData = getDeviceHardwareIDs(env)
     while datetime.datetime.now() <= minuteFromNow:
-        for switchStr in ( Environment.list_switches() ):
-            currentSwitch = Environment.get_switch(switchStr)
+        for switchStr in ( env.list_switches() ):
+            currentSwitch = env.get_switch(switchStr)
             switchMAC = currentSwitch.basicevent.GetMacAddr()
             for index, deviceHardwareIDRow in enumerate(deviceHardwareData):
                 if switchMAC == deviceHardwareIDRow[0]:
@@ -78,9 +80,9 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
                                              , insightCurrentPower]
                                             )                    
             exportDataString = ([deviceHardwareData[currentSwitchHardwareIndex][0]['MacAddr'], deviceHardwareData[currentSwitchHardwareIndex][3], switchSignalStrength['SignalStrength'], deviceHardwareData[currentSwitchHardwareIndex][0]['SerialNo'], deviceHardwareData[currentSwitchHardwareIndex][5], deviceHardwareData[currentSwitchHardwareIndex][2]['FirmwareVersion'], switchStr, switchCurrentState['BinaryState'], insightCurrentPower] )
-            #print( exportDataString )
+            print( exportDataString )
         currentLoopIteration = currentLoopIteration + 1
-        Environment.wait(fetchDataDelaySeconds)
+        env.wait(fetchDataDelaySeconds)
         #print("Current loop count: " + str(currentLoopIteration))
     currentPowerSum = 0
     for powerDataPoint in switchPowerDataArray:
@@ -105,7 +107,6 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
                 GROUP BY MACAddress, SerialNbr"""
     returnData = []
     for dataRow in databaseCursor.execute(tableQuery):
-        #print(dataRow)
         returnData.append(dataRow)
     
     tableQuery = """
@@ -124,10 +125,16 @@ def aggregateDeviceData(Environment, numSecondsForDiscovery, numMinutesToGatherD
     #Debug query and output to see detail data in the database table:
     #for detailData in databaseCursor.execute(tableQuery):
     #    print(detailData)
+
+    #I had to manually kill the UPnP server and remove the ouimeaux environment in order to fetch the device name in case it changed since the last call to this function
+    env.upnp.server.stop()
+    env.registry.server.stop()
+    del env
     return returnData
 
 def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
     for currentDataRow in currentDataSet:
+        print("Beginning work in MS SQL Server")
         #I hate that I've hard-coded the order of data in this function; ideally you'd pass a dictionary into this, but I'm not sure how to do that and am too tired to research how this works: http://stackoverflow.com/questions/3300464/how-can-i-get-dict-from-sqlite-query
         #print(currentDataRow[5])
         #First, we need to fill the lookup tables before we can start filling the tables with FK's to the lookups:
@@ -201,6 +208,7 @@ def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
                         target.macAddress = source.macAddress 
                         AND target.serialNumber = source.serialNumber
                     )
+                    --Honestly, this is bad code; you should likely return a SELECT to the application to see if an UPDATE is necessary. This will UPDATE a device record every time the application has data from a device.  Lots and lots of unnecessary writes.
                     WHEN MATCHED THEN 
 	                    UPDATE SET 
                             target.macAddress = source.macAddress
@@ -296,13 +304,14 @@ def InsertOrUpdateDatabase(mssqldb, mssqlcursor,currentDataSet):
                             ;           
         """,(currentDeviceSK, currentDataRow[2], currentstatusSK, currentDataRow[8], currentPowerScaleSK, currentDataRow[9]))
         mssqldb.commit()
+        print("Finished with MS SQL Server work!")
 
 
 if __name__ == "__main__":
     print("")
     print("Unit Test of Ouimeaux")
     print("---------------")
-    env = Environment()
+
     # TODO: run from 10am to 10pm
 
 #Initialize the database in memory:
@@ -310,11 +319,7 @@ try:
     cur = db.cursor()
     init_db(cur)
 
-    cur.execute("select 947128723 as this_is_a_test_dict")
-
-
-    env.start()
-    numSecondsForDiscovery = 8
+    numSecondsForDiscovery = 35
     numMinutesToGatherData = 1
     fetchDataDelaySeconds = 10
     server="10.0.60.25"
@@ -327,8 +332,8 @@ try:
     mssqlcursor = mssqldb.cursor()
 
     while(1==1):
-        currentDataSet = aggregateDeviceData(Environment=env,numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
-        print(currentDataSet)
+        currentDataSet = aggregateDeviceData(numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
+        #print(currentDataSet)
         InsertOrUpdateDatabase(mssqldb,mssqlcursor,currentDataSet)
 
     input("Press Enter to continue...")
