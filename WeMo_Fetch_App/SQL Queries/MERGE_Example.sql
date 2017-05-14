@@ -1,7 +1,7 @@
 MERGE INTO deviceFirmware AS target
 USING (SELECT 
-			'testfirmwarelalalaal' AS firmwareName
-			,'v0.5' AS firmwareVersion
+			'testdsfasdffirmflalalaal' AS firmwareName
+			,'v99.5' AS firmwareVersion
 	) AS source (firmwareName, firmwareVersion)
 ON (target.firmwareName = source.firmwareName)
 WHEN MATCHED THEN 
@@ -9,12 +9,32 @@ WHEN MATCHED THEN
 		,target.firmwareVersion = source.firmwareVersion
 WHEN NOT MATCHED THEN 
 	INSERT (firmwareName, firmwareVersion)
-	VALUES (source.firmwareName, source.firmwareVersion);
+	VALUES (source.firmwareName, source.firmwareVersion)
+OUTPUT inserted.[deviceFirmwareSK]
 ;
 
 --Msg 11742, Level 15, State 1, Line 12
 --NEXT VALUE FOR function can only be used with MERGE if it is defined within a default constraint on the target table for insert actions. 
 
+
+MERGE INTO Sandbox.dbo.statusList AS target
+USING (SELECT 
+			%s AS statusNumberRepresentation
+            ,%s AS sourceSystem
+	) AS source (statusNumberRepresentation, sourceSystem)
+ON (
+    target.statusNumberRepresentation = source.statusNumberRepresentation
+    AND target.sourceSystem = source.sourceSystem
+)
+WHEN MATCHED THEN 
+	UPDATE SET target.statusNumberRepresentation = source.statusNumberRepresentation
+                ,target.sourceSystem = source.sourceSystem
+                ,target.statusChangedDate = getdate()
+WHEN NOT MATCHED THEN 
+	INSERT (statusNumberRepresentation, sourceSystem, statusAddedDate)
+    VALUES(source.statusNumberRepresentation, source.sourceSystem, getdate())
+OUTPUT inserted.statusSK
+;         
 
 
 
@@ -39,4 +59,5 @@ INSERT INTO [dbo].[deviceFirmware]
            ,<isCurrent, bit,>)
 GO
 
+;
 
