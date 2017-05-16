@@ -71,8 +71,6 @@
     <Build Include="dbo\Tables\deviceUsageData.sql" />
     <Build Include="dbo\Tables\deviceTypes.sql" />
     <Build Include="dbo\Tables\deviceFirmware.sql" />
-    <Build Include="Security\ouimeaux.sql" />
-    <Build Include="Security\RoleMemberships.sql" />
     <Build Include="dbo\Sequences\statusListSK.sql" />
     <Build Include="dbo\Sequences\powerScaleSK.sql" />
     <Build Include="dbo\Sequences\networkMetadataSK.sql" />
@@ -82,7 +80,6 @@
     <Build Include="dbo\Sequences\deviceFirmwareSK.sql" />
     <Build Include="dbo\Tables\locations.sql" />
     <Build Include="dbo\Views\WeMoDenormalizedReport_OLTP.sql" />
-    <Build Include="Security\wemoReporter.sql" />
     <Build Include="dbo\Sequences\locationSK.sql" />
   </ItemGroup>
 </Project>

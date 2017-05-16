@@ -1,6 +1,7 @@
 ﻿
 
 
+
 /****** Script for SelectTopNRows command from SSMS  ******/
 CREATE VIEW [dbo].[WeMoDenormalizedReport_OLTP] AS (
 SELECT 
@@ -23,6 +24,7 @@ SELECT
 	  ,id.retiredDevice
 	  ,nm.ipAddress
 	  ,dt.deviceTypeLabel
+	  ,dud.deviceUsageDataSK
   FROM [dbo].[deviceUsageData] dud
 	INNER JOIN IoTDevice id
 		ON dud.deviceFK = id.deviceSK
