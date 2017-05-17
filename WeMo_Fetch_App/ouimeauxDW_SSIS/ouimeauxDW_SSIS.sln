@@ -1,0 +1,19 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "ouimeauxDW_SSIS", "ouimeauxDW_SSIS\ouimeauxDW_SSIS.dtproj", "{92A4A7F2-84D8-41FD-A22C-1E2B72AFA819}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{92A4A7F2-84D8-41FD-A22C-1E2B72AFA819}.Development|Default.ActiveCfg = Development
+		{92A4A7F2-84D8-41FD-A22C-1E2B72AFA819}.Development|Default.Build.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
