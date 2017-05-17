@@ -8,9 +8,3 @@
     CONSTRAINT [PK_networkMetadata] PRIMARY KEY CLUSTERED ([networkMetadataSK] ASC)
 );
 
-
-
-
-
-
-

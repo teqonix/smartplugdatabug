@@ -17,9 +17,3 @@
     CONSTRAINT [FK_IoTDevice_networkMetadata] FOREIGN KEY ([deviceIPAddressFK]) REFERENCES [dbo].[networkMetadata] ([networkMetadataSK])
 );
 
-
-
-
-
-
-

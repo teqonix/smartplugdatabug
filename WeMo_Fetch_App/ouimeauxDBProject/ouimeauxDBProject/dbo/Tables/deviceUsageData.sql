@@ -15,7 +15,3 @@
     CONSTRAINT [FK_deviceUsageData_statusList] FOREIGN KEY ([deviceStateFK]) REFERENCES [dbo].[statusList] ([statusSK])
 );
 
-
-
-
-

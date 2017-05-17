@@ -8,7 +8,3 @@
     CONSTRAINT [PK_statusList] PRIMARY KEY CLUSTERED ([statusSK] ASC)
 );
 
-
-
-
-

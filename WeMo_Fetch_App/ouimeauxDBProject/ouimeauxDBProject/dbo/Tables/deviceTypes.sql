@@ -8,7 +8,3 @@
     CONSTRAINT [PK_deviceTypes] PRIMARY KEY CLUSTERED ([deviceTypeSK] ASC)
 );
 
-
-
-
-

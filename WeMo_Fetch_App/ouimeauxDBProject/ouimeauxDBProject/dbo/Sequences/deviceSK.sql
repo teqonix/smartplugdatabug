@@ -1,7 +1,5 @@
-﻿CREATE SEQUENCE [dbo].[deviceTypeSK]
+﻿CREATE SEQUENCE [dbo].[deviceSK]
     AS BIGINT
     INCREMENT BY 1
     MINVALUE 1;
-
-
 

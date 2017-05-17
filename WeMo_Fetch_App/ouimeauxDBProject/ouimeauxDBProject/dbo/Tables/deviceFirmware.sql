@@ -9,7 +9,3 @@
     CONSTRAINT [PK_deviceFirmware] PRIMARY KEY CLUSTERED ([deviceFirmwareSK] ASC)
 );
 
-
-
-
-

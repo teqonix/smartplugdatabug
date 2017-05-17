@@ -6,5 +6,3 @@
     CONSTRAINT [PK_powerScales] PRIMARY KEY CLUSTERED ([powerScaleSK] ASC)
 );
 
-
-

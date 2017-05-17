@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>OuimeauxDB</Name>
+    <Name>ouimeauxDBProject</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{2492ced9-7423-41c1-a8b8-4923ae1c8e6d}</ProjectGuid>
+    <ProjectGuid>{3e8dc6aa-f5a8-4024-962a-c53af65dbf1f}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>OuimeauxDB</RootNamespace>
-    <AssemblyName>OuimeauxDB</AssemblyName>
+    <RootNamespace>ouimeauxDBProject</RootNamespace>
+    <AssemblyName>ouimeauxDBProject</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -57,29 +57,5 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="dbo\" />
-    <Folder Include="dbo\Tables\" />
-    <Folder Include="Security\" />
-    <Folder Include="dbo\Sequences\" />
-    <Folder Include="dbo\Views\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="dbo\Tables\statusList.sql" />
-    <Build Include="dbo\Tables\powerScales.sql" />
-    <Build Include="dbo\Tables\networkMetadata.sql" />
-    <Build Include="dbo\Tables\IoTDevice.sql" />
-    <Build Include="dbo\Tables\deviceUsageData.sql" />
-    <Build Include="dbo\Tables\deviceTypes.sql" />
-    <Build Include="dbo\Tables\deviceFirmware.sql" />
-    <Build Include="dbo\Sequences\statusListSK.sql" />
-    <Build Include="dbo\Sequences\powerScaleSK.sql" />
-    <Build Include="dbo\Sequences\networkMetadataSK.sql" />
-    <Build Include="dbo\Sequences\deviceUsageDataSK.sql" />
-    <Build Include="dbo\Sequences\deviceTypeSK.sql" />
-    <Build Include="dbo\Sequences\deviceSK.sql" />
-    <Build Include="dbo\Sequences\deviceFirmwareSK.sql" />
-    <Build Include="dbo\Tables\locations.sql" />
-    <Build Include="dbo\Views\WeMoDenormalizedReport_OLTP.sql" />
-    <Build Include="dbo\Sequences\locationSK.sql" />
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@
     [dataPointDateIK]          BIGINT   NOT NULL,
     [factEffectiveDate]        DATE     NOT NULL,
     CONSTRAINT [PK_factDeviceMeasurement] PRIMARY KEY CLUSTERED ([deviceMeasurementIK] ASC),
-    CONSTRAINT [FK_factDeviceMeasurement_dimDateHour] FOREIGN KEY ([dataPointDateIK]) REFERENCES [dw].[dimDateHour] ([dateTimeIK]),
+    CONSTRAINT [FK_factDeviceMeasurement_dimDateHour] FOREIGN KEY ([dataPointDateIK]) REFERENCES [dw].[dimDateQuarterHour] ([dateTimeIK]),
     CONSTRAINT [FK_factDeviceMeasurement_dimDevice] FOREIGN KEY ([dimDeviceIK]) REFERENCES [dw].[dimDevice] ([deviceIK]),
     CONSTRAINT [FK_factDeviceMeasurement_dimLocation] FOREIGN KEY ([dimLocationIK]) REFERENCES [dw].[dimLocation] ([LocationIK]),
     CONSTRAINT [FK_factDeviceMeasurement_dimPowerScales] FOREIGN KEY ([dimPowerScalesIK]) REFERENCES [dw].[dimPowerScales] ([powerScaleIK]),
