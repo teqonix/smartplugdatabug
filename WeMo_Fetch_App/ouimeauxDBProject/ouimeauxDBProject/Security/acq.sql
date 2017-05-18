@@ -1,3 +1,3 @@
 ﻿CREATE SCHEMA [acq]
-    AUTHORIZATION [dbo];
+    AUTHORIZATION [wemoSSIS];
 

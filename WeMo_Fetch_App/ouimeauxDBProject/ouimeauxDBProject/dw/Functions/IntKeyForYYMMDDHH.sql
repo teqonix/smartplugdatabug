@@ -26,7 +26,9 @@ BEGIN
  select @sYYYYMMDDHH = @sYYYYMMDD + @sHour 
  select @iReturn = convert(int,@sYYYYMMDDHH) -- Return the result of the function
  RETURN @iReturn 
-END
+END 
+
+
 GO
 EXECUTE sp_addextendedproperty @name = N'Description', @value = N'This function is used to generate the integer key used to join fact tables to the dateTime dimension with hourly granularity.', @level0type = N'SCHEMA', @level0name = N'dw', @level1type = N'FUNCTION', @level1name = N'IntKeyForYYMMDDHH';
 
