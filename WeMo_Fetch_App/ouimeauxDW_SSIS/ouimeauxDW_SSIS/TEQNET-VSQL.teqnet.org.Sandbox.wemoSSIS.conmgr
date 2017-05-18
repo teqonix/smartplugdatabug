@@ -2,13 +2,6 @@
 <DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
   DTS:ObjectName="TEQNET-VSQL.teqnet.org.Sandbox.wemoSSIS"
   DTS:DTSID="{613D5DE1-1942-449F-B8B5-16E57138738A}"
-  DTS:CreationName="ADO">
-  <DTS:ObjectData>
-    <DTS:ConnectionManager
-      DTS:ConnectionString="Data Source=TEQNET-VSQL.teqnet.org;User ID=wemoSSIS;Initial Catalog=Sandbox;Provider=SQLNCLI11.1;Persist Security Info=True;Auto Translate=False;">
-      <DTS:Password
-        DTS:Name="Password"
-        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAATloSPb+oDESOJpMOC75zXAAAAAACAAAAAAADZgAAwAAAABAAAACC452Xiv8Hd5vUKX/cz7Q9AAAAAASAAACgAAAAEAAAAPstSXfQXWGNjo9ojVG8flKAAAAA1GhZpAkZsZ/s5Hkji79swzPsGTJdmMUiacoZIE6+SzprPnp3qNWT5t9tYiKOzg0MxKZxCRTn9KSrkq28Q1c2PuwMMjmHiiSF+A85EGYE2BfFae0VbReEwzC0hqM9jdfX0CofgbqFC16odfJVeSZsapbKQ3VE6lHlqhdAMECPRW4UAAAATWSB4aUa8GKWNvJpC4tHbL7UDYk=</DTS:Password>
-    </DTS:ConnectionManager>
-  </DTS:ObjectData>
-</DTS:ConnectionManager>
+  DTS:CreationName="ADO"
+  p1:Salt="ZpvCVD/W+Q=="
+  p1:IV="vlnVRNRuPBA=" xmlns:p1="www.microsoft.com/SqlServer/SSIS">xNk6XRLcEEzPKjGZOJEFXnm3lUo/V/OyrtbsFAuBqsoWK3asDS7uWmSa1drVAAjd+Tib1wqrBw46uevDAFb+TqFQqHqDJ0ViHiQVPfg0/NrTH/MzYBxqcHWaUDD9Mi1wBbzRnS0Ut83xcfyR+KyCV0h6UUluLbgJs7sHee6v2NfagyD8H97+JTmKuXbfesdq1VKl4UBlE/zL8neAmj7DSA71tuopfja5mxIQbIrZxv4madZ6gCqHs11BpnV3nJVtOxRo6oXOqzmqpiBLbMOiFJyf5mQw52+kiJsqQslpWZUD+cGKl1jyG3iEVhQKszRX31xCTRdOoCI6/eLlAxftuXDLCt1jY1V72xZjL8yDDFSIIWm1fHMPxu492eo5PvBSxgHHUVyf9kPdpo84fdvf7d/EyvgGwySo7gtJL29RfwTTGl54HjXEBI5hxsxY0Bmz3ICrNwInzVwBatCOEXeKRKogECP75CWuVFASEM0rEjt++Dim+IcFwB3Z/YOvY4tx9EyGOVBTMQLbvrqBhMF9kiaw6ECTTQqqIihsGdG78F9LkGrxpSRjeu6EdFUWwnI2aFE3ycdcCmeujYNy+VH+ZHFseSN7LppFlISQ1esuE2TwWBZ/PqYy6Qu2DEYWkuGSIItz2tgKxh+vao4ha9WFGQpUVK4Ptl4xyKPcZf5AHilkgRghfM3F9aza5OcQ5TkuLv8SGtT/m+6wTg1xM5JR0l62KxG0+z5d</DTS:ConnectionManager>
