@@ -6,7 +6,9 @@
     [statusAddedDate]            DATE           NOT NULL,
     [recordEffectiveDate]        DATE           NOT NULL,
     [recordExpirationDate]       DATE           NULL,
-    [isCurrent]                  BIT            NOT NULL,
+    [isCurrent]                  BIT            NULL,
     CONSTRAINT [PK_dimStatusList] PRIMARY KEY CLUSTERED ([statusIK] ASC)
 );
+
+
 

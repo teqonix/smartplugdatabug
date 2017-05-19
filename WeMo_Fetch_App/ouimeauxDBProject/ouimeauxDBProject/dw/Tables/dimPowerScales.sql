@@ -4,7 +4,10 @@
     [scaleAddedDate]       DATE           NULL,
     [recordEffectiveDate]  DATE           NOT NULL,
     [recordExpirationDate] DATE           NULL,
-    [isCurrent]            BIT            NOT NULL,
+    [isCurrent]            BIT            NULL,
+    [powerScaleNaturalKey] BIGINT         NOT NULL,
     CONSTRAINT [PK_dimPowerScales] PRIMARY KEY CLUSTERED ([powerScaleIK] ASC)
 );
+
+
 

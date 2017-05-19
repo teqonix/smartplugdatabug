@@ -15,10 +15,12 @@
     [ipAddress]                   NVARCHAR (255)  NULL,
     [subnetMask]                  NVARCHAR (255)  NULL,
     [tcpIPversion]                NVARCHAR (6)    NULL,
-    [deviceFirstSeenDate]         DATETIME        NOT NULL,
+    [deviceFirstSeenDate]         DATETIME        NULL,
     [recordEffectiveDate]         DATETIME        CONSTRAINT [DF_dimDevice_recordEffectiveDate] DEFAULT (getdate()) NULL,
     [recordExpirationDate]        DATETIME        NULL,
     [isCurrent]                   BIT             NULL,
     CONSTRAINT [PK_dimDevice] PRIMARY KEY CLUSTERED ([deviceIK] ASC)
 );
+
+
 
