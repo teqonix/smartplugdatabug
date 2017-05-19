@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE acq.truncateAcq
+﻿
+CREATE PROCEDURE [acq].[truncateAcq]
 AS
 BEGIN
 
@@ -11,5 +12,6 @@ BEGIN
 	TRUNCATE TABLE acq.deviceFirmware;
 	TRUNCATE TABLE acq.IoTDevice;
 	TRUNCATE TABLE acq.deviceUsageData;
+	TRUNCATE TABLE [acq].[etlFactRecordStaging];
 
 END

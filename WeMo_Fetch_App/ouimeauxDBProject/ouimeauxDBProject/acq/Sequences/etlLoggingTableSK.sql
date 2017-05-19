@@ -1,0 +1,5 @@
+﻿CREATE SEQUENCE [acq].[etlLoggingTableSK]
+    AS BIGINT
+    START WITH 1
+    INCREMENT BY 1;
+

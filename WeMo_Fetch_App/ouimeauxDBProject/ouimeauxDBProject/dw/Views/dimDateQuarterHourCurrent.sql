@@ -1,0 +1,22 @@
+﻿CREATE VIEW dw.dimDateQuarterHourCurrent AS (
+	SELECT [dateTimeIK]
+		  ,[dateTimeHour]
+		  ,[DateTime]
+		  ,[DateString]
+		  ,[HourOfDay]
+		  ,[MinuteOfHour]
+		  ,[Date]
+		  ,[Day]
+		  ,[DayofYear]
+		  ,[DayofWeek]
+		  ,[DayofWeekName]
+		  ,[Week]
+		  ,[Month]
+		  ,[MonthName]
+		  ,[Quarter]
+		  ,[Year]
+		  ,[IsWeekend]
+		  ,[IsLeapYear]
+	  FROM [Sandbox].[dw].[dimDateQuarterHour]
+	  WHERE dateTimeHour BETWEEN 2017010100 AND 2019010100
+)
