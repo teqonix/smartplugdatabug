@@ -99,3 +99,9 @@ INSERT INTO [acq].[etlFactRecordStaging] (
 ;
 
 END
+
+GO
+GRANT EXECUTE
+    ON OBJECT::[acq].[fillEtlFactRecordStaging] TO [TEQNET\SSIS_SVC]
+    AS [wemoSSIS];
+

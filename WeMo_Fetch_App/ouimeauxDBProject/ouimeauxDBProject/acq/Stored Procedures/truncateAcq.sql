@@ -15,3 +15,9 @@ BEGIN
 	TRUNCATE TABLE [acq].[etlFactRecordStaging];
 
 END
+
+GO
+GRANT EXECUTE
+    ON OBJECT::[acq].[truncateAcq] TO [TEQNET\SSIS_SVC]
+    AS [wemoSSIS];
+

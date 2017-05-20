@@ -25,3 +25,9 @@ BEGIN
 	FROM [acq].[etlFactRecordStaging]
 
 END
+
+GO
+GRANT EXECUTE
+    ON OBJECT::[acq].[etlLogActivity] TO [TEQNET\SSIS_SVC]
+    AS [wemoSSIS];
+

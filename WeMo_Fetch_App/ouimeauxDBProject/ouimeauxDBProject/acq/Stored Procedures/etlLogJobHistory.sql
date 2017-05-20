@@ -42,3 +42,9 @@ BEGIN
 		;	
 
 END
+
+GO
+GRANT EXECUTE
+    ON OBJECT::[acq].[etlLogJobHistory] TO [TEQNET\SSIS_SVC]
+    AS [wemoSSIS];
+

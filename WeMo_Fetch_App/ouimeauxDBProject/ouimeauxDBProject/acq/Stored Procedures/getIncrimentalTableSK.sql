@@ -13,3 +13,9 @@ BEGIN
   ;
 
 END
+
+GO
+GRANT EXECUTE
+    ON OBJECT::[acq].[getIncrimentalTableSK] TO [TEQNET\SSIS_SVC]
+    AS [wemoSSIS];
+
