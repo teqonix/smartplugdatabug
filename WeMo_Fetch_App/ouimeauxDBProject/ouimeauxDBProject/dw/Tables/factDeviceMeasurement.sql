@@ -19,5 +19,3 @@
     CONSTRAINT [FK_factDeviceMeasurement_dimStatusList] FOREIGN KEY ([dimStatusListIK]) REFERENCES [dw].[dimStatusList] ([statusIK])
 );
 
-
-

@@ -1,5 +1,3 @@
 ﻿CREATE SCHEMA [acq]
     AUTHORIZATION [wemoSSIS];
 
-
-

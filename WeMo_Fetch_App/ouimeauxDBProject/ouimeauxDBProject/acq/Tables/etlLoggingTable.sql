@@ -8,5 +8,3 @@
     CONSTRAINT [PK_etlLoggingTable] PRIMARY KEY CLUSTERED ([etlLogSK] ASC)
 );
 
-
-

@@ -10,5 +10,3 @@
     CONSTRAINT [PK_dimStatusList] PRIMARY KEY CLUSTERED ([statusIK] ASC)
 );
 
-
-

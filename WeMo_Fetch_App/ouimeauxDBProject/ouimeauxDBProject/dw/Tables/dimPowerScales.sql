@@ -9,5 +9,3 @@
     CONSTRAINT [PK_dimPowerScales] PRIMARY KEY CLUSTERED ([powerScaleIK] ASC)
 );
 
-
-

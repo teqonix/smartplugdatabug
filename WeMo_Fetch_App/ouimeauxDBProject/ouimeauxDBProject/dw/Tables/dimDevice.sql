@@ -22,5 +22,3 @@
     CONSTRAINT [PK_dimDevice] PRIMARY KEY CLUSTERED ([deviceIK] ASC)
 );
 
-
-
