@@ -61,10 +61,11 @@
     <Folder Include="Properties" />
     <Folder Include="dw\" />
     <Folder Include="dw\Tables\" />
-    <Folder Include="dbo\" />
-    <Folder Include="dbo\Tables\" />
     <Folder Include="acq\" />
     <Folder Include="acq\Tables\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dw\Views\" />
     <Folder Include="dbo\Views\" />
     <Folder Include="Storage\" />
     <Folder Include="Security\" />
@@ -72,13 +73,17 @@
     <Folder Include="acq\Stored Procedures\" />
     <Folder Include="dw\Sequences\" />
     <Folder Include="dbo\Sequences\" />
+    <Folder Include="acq\Sequences\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dw\Tables\dimLocation.sql" />
-    <Build Include="dw\Tables\dimDevice.sql" />
     <Build Include="dw\Tables\dimStatusList.sql" />
     <Build Include="dw\Tables\dimPowerScales.sql" />
+    <Build Include="dw\Tables\dimDevice.sql" />
     <Build Include="dw\Tables\factDeviceMeasurement.sql" />
+    <Build Include="acq\Tables\etlFactRecordStaging.sql" />
+    <Build Include="acq\Tables\etlLoggingTable.sql" />
+    <Build Include="acq\Tables\etlAuditLog.sql" />
     <Build Include="dbo\Tables\IoTDevice.sql" />
     <Build Include="dbo\Tables\deviceUsageData.sql" />
     <Build Include="dw\Tables\dimDateQuarterHour.sql" />
@@ -96,7 +101,11 @@
     <Build Include="acq\Tables\deviceUsageData.sql" />
     <Build Include="dbo\Tables\locations.sql" />
     <Build Include="acq\Tables\deviceFirmware.sql" />
-    <Build Include="acq\Tables\etlLoggingTable.sql" />
+    <Build Include="dw\Views\dimDeviceCurrent.sql" />
+    <Build Include="dw\Views\dimLocationCurrent.sql" />
+    <Build Include="dw\Views\dimPowerScalesCurrent.sql" />
+    <Build Include="dw\Views\dimStatusListCurrent.sql" />
+    <Build Include="dw\Views\dimDateQuarterHourCurrent.sql" />
     <Build Include="dbo\Views\WeMoDenormalizedReport_OLTP.sql" />
     <Build Include="Storage\fileGroup1.sql" />
     <Build Include="Storage\fileGroup2.sql" />
@@ -112,6 +121,9 @@
     <Build Include="Security\wemoSSIS.sql" />
     <Build Include="Security\RoleMemberships.sql" />
     <Build Include="dw\Functions\IntKeyForYYMMDDHH.sql" />
+    <Build Include="acq\Stored Procedures\fillEtlFactRecordStaging.sql" />
+    <Build Include="acq\Stored Procedures\etlLogActivity.sql" />
+    <Build Include="acq\Stored Procedures\etlLogJobHistory.sql" />
     <Build Include="acq\Stored Procedures\truncateAcq.sql" />
     <Build Include="acq\Stored Procedures\getIncrimentalTableSK.sql" />
     <Build Include="Security\acq.sql" />
@@ -119,6 +131,7 @@
     <Build Include="dw\Sequences\dimPowerScalesIK.sql" />
     <Build Include="dw\Sequences\factDeviceMeasurementIK.sql" />
     <Build Include="dbo\Sequences\deviceUsageDataSK.sql" />
+    <Build Include="acq\Sequences\etlLoggingTableSK.sql" />
     <Build Include="dbo\Sequences\networkMetadataSK.sql" />
     <Build Include="dbo\Sequences\deviceTypeSK.sql" />
     <Build Include="dbo\Sequences\deviceFirmwareSK.sql" />
@@ -130,5 +143,6 @@
     <Build Include="dw\Sequences\dimDeviceIK.sql" />
     <Build Include="dw\Sequences\dimLocationIK.sql" />
     <Build Include="dw\Sequences\dimStatusListIK.sql" />
+    <Build Include="Security\TEQNET_SSIS_SVC.sql" />
   </ItemGroup>
 </Project>
