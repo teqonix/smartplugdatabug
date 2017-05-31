@@ -1,0 +1,1630 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1200,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "name": "TEQNET-VSQL",
+        "connectionString": "Provider=SQLNCLI11;Data Source=TEQNET-VSQL.teqnet.org;Initial Catalog=Sandbox;User ID=ouimeaux;Persist Security Info=true",
+        "impersonationMode": "impersonateAccount",
+        "account": "TEQNET\\SQLREPORTER",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "IoT Devices",
+        "columns": [
+          {
+            "name": "deviceIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "deviceIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "deviceNaturalKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "deviceNaturalKey",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Network MAC Address",
+            "dataType": "string",
+            "sourceColumn": "macAddress",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Device Serial #",
+            "dataType": "string",
+            "sourceColumn": "serialNumber",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Device Name",
+            "dataType": "string",
+            "sourceColumn": "friendlyName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Type of Device",
+            "dataType": "string",
+            "sourceColumn": "deviceTypeLabel",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Device Switches Power On/Off?",
+            "dataType": "boolean",
+            "sourceColumn": "deviceIsSwitch",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "Device is a Thermostat?",
+            "dataType": "boolean",
+            "sourceColumn": "deviceIsThermostat",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "Device can Measure Energy Used?",
+            "dataType": "boolean",
+            "sourceColumn": "deviceCanMeasureEnergyUsage",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "Device is a Light Bulb?",
+            "dataType": "boolean",
+            "sourceColumn": "deviceIsLightBulb",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "Firmware Name",
+            "dataType": "string",
+            "sourceColumn": "firmwareName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Firmware Version",
+            "dataType": "string",
+            "sourceColumn": "firmwareVersion",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Firmware Signature",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "firmwareSignature",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Network IP Address",
+            "dataType": "string",
+            "sourceColumn": "ipAddress",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Network Subnet Mask",
+            "dataType": "string",
+            "sourceColumn": "subnetMask",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "TCP/IP Protocol Used",
+            "dataType": "string",
+            "sourceColumn": "tcpIPversion",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "deviceFirstSeenDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "deviceFirstSeenDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "recordEffectiveDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordEffectiveDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "recordExpirationDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordExpirationDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "isCurrent",
+            "dataType": "boolean",
+            "isHidden": true,
+            "sourceColumn": "isCurrent",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dimDevice",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[dimDevice].* FROM [dw].[dimDevice] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[dimDevice].* FROM [dw].[dimDevice] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "dimDevice"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      },
+      {
+        "name": "Device Locations",
+        "columns": [
+          {
+            "name": "LocationIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "LocationIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "locationNaturalKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "locationNaturalKey",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Location in Room",
+            "dataType": "string",
+            "sourceColumn": "locationName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Floor of House",
+            "dataType": "string",
+            "sourceColumn": "locationFloor",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Room of House",
+            "dataType": "string",
+            "sourceColumn": "locationRoom",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "locationFirstSeenDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "locationFirstSeenDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "recordEffectiveDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordEffectiveDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "recordExpirationDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordExpirationDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "isCurrent",
+            "dataType": "boolean",
+            "isHidden": true,
+            "sourceColumn": "isCurrent",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dimLocation",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[dimLocation].* FROM [dw].[dimLocation] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Location Hierarchy",
+            "levels": [
+              {
+                "name": "Floor of House",
+                "ordinal": 0,
+                "column": "Floor of House"
+              },
+              {
+                "name": "Room of House",
+                "ordinal": 1,
+                "column": "Room of House"
+              },
+              {
+                "name": "Location in Room",
+                "ordinal": 2,
+                "column": "Location in Room"
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[dimLocation].* FROM [dw].[dimLocation] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "dimLocation"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      },
+      {
+        "name": "Measurements Used",
+        "columns": [
+          {
+            "name": "powerScaleIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "powerScaleIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Type of Metric",
+            "dataType": "string",
+            "sourceColumn": "unitOfPower",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "scaleAddedDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "scaleAddedDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "recordEffectiveDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordEffectiveDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "recordExpirationDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordExpirationDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "isCurrent",
+            "dataType": "boolean",
+            "isHidden": true,
+            "sourceColumn": "isCurrent",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "powerScaleNaturalKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "powerScaleNaturalKey",
+            "sourceProviderType": "BigInt"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dimPowerScales",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[dimPowerScales].* FROM [dw].[dimPowerScales] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[dimPowerScales].* FROM [dw].[dimPowerScales] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "dimPowerScales"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      },
+      {
+        "name": "Device Statuses",
+        "columns": [
+          {
+            "name": "statusIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "statusIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "statusNaturalKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "statusNaturalKey",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Device Status",
+            "dataType": "string",
+            "sourceColumn": "statusLabel",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Technical Status ID",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "statusNumberRepresentation",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "statusAddedDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "statusAddedDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "recordEffectiveDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordEffectiveDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "recordExpirationDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "recordExpirationDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "isCurrent",
+            "dataType": "boolean",
+            "isHidden": true,
+            "sourceColumn": "isCurrent",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dimStatusList",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[dimStatusList].* FROM [dw].[dimStatusList] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[dimStatusList].* FROM [dw].[dimStatusList] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "dimStatusList"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      },
+      {
+        "name": "Device Usage Data",
+        "columns": [
+          {
+            "name": "deviceMeasurementIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "deviceMeasurementIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimDeviceIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimDeviceIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimLocationIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimLocationIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimStatusListIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimStatusListIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimPowerScalesIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimPowerScalesIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Signal Strength",
+            "dataType": "int64",
+            "sourceColumn": "deviceSignalStrength",
+            "sourceProviderType": "SmallInt",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "Power Usage (milliWatts)",
+            "dataType": "int64",
+            "sourceColumn": "devicePowerUsage",
+            "sourceProviderType": "Integer",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "Temperature Setting (F)",
+            "dataType": "int64",
+            "sourceColumn": "deviceTemperatureSetting",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Temperature Reading (F)",
+            "dataType": "int64",
+            "sourceColumn": "deviceTemperatureReadingF",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Sample Size from Sensor",
+            "dataType": "int64",
+            "sourceColumn": "dataPointSampleSize",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "dataPointDateIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dataPointDateIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "factEffectiveDate",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "factEffectiveDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "factDeviceMeasurement",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[factDeviceMeasurement].* FROM [dw].[factDeviceMeasurement] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Avg. Signal Strength",
+            "expression": "AVERAGE([Signal Strength])"
+          },
+          {
+            "name": "Avg. Power Usage (Watts)",
+            "expression": "AVERAGE([Power Usage (milliWatts)])"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[factDeviceMeasurement].* FROM [dw].[factDeviceMeasurement] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "factDeviceMeasurement"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      },
+      {
+        "name": "Date Dimension",
+        "columns": [
+          {
+            "name": "dateTimeIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dateTimeIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dateTimeHour",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dateTimeHour",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "DateTime",
+            "dataType": "dateTime",
+            "sourceColumn": "DateTime",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "DateString",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "DateString",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "HourOfDay",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "HourOfDay",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "MinuteOfHour",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "MinuteOfHour",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "Date",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "Day of Month #",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "Day",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "DayofYear",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "DayofYear",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Day of Week #",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "DayofWeek",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "DayofWeekName",
+            "dataType": "string",
+            "sourceColumn": "DayofWeekName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "Week",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "Week",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Month #",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "Month",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Month",
+            "dataType": "string",
+            "sourceColumn": "MonthName",
+            "sourceProviderType": "Char"
+          },
+          {
+            "name": "Quarter",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "Quarter",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Weekend?",
+            "dataType": "boolean",
+            "sourceColumn": "IsWeekend",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "name": "Leap Year?",
+            "dataType": "boolean",
+            "isHidden": true,
+            "sourceColumn": "IsLeapYear",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          },
+          {
+            "type": "calculated",
+            "name": "Day of Month",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "LEFT([DateString],LEN([DateString]) - 2)"
+          },
+          {
+            "type": "calculated",
+            "name": "Hour of Day",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "CONCATENATE(CONCATENATE(CONCATENATE([HourOfDay],\" (\"),FORMAT('Date Dimension'[DateTime],\"Medium Time\")),\")\")",
+            "sortByColumn": "HourOfDay"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dimDateQuarterHourCurrent",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[dimDateQuarterHourCurrent].* FROM [dw].[dimDateQuarterHourCurrent] ",
+              "dataSource": "TEQNET-VSQL"
+            },
+            "annotations": [
+              {
+                "name": "TableWidgetSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"TableWidgetSerialization\"><AnnotationContent><![CDATA[<?xml version=\"1.0\"?>",
+                  "<TableWidgetGridSerialization xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+                  "  <ColumnSuggestedType />",
+                  "  <ColumnFormat />",
+                  "  <ColumnAccuracy />",
+                  "  <ColumnCurrencySymbol />",
+                  "  <ColumnPositivePattern />",
+                  "  <ColumnNegativePattern />",
+                  "  <ColumnWidths>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>dateTimeIK</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>120</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>dateTimeHour</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>140</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DateTime</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>107</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DateString</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>113</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>HourOfDay</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>118</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>MinuteOfHour</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>138</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Date</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>71</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Day</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>66</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofYear</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>112</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofWeek</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>118</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofWeekName</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>159</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Week</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>77</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Month</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>83</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>MonthName</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>124</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Quarter</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>93</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Year</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>71</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>IsWeekend</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>116</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>IsLeapYear</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>117</int>",
+                  "      </value>",
+                  "    </item>",
+                  "  </ColumnWidths>",
+                  "  <ColumnDisplayIndex>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>dateTimeIK</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>0</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>dateTimeHour</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>1</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DateTime</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>2</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DateString</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>3</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>HourOfDay</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>4</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>MinuteOfHour</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>5</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Date</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>6</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Day</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>7</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofYear</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>8</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofWeek</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>9</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>DayofWeekName</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>10</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Week</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>11</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Month</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>12</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>MonthName</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>13</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Quarter</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>14</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>Year</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>15</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>IsWeekend</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>16</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>IsLeapYear</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>17</int>",
+                  "      </value>",
+                  "    </item>",
+                  "  </ColumnDisplayIndex>",
+                  "  <ColumnFrozen />",
+                  "  <ColumnChecked />",
+                  "  <ColumnFilter />",
+                  "  <SelectionFilter />",
+                  "  <FilterParameters />",
+                  "  <IsSortDescending>false</IsSortDescending>",
+                  "</TableWidgetGridSerialization>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Simple Date Hierarchy",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "Year"
+              },
+              {
+                "name": "Month",
+                "ordinal": 1,
+                "column": "Month"
+              },
+              {
+                "name": "Day of Month",
+                "ordinal": 2,
+                "column": "Day of Month"
+              },
+              {
+                "name": "Hour of Day",
+                "ordinal": 3,
+                "column": "Hour of Day"
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[dimDateQuarterHourCurrent].* FROM [dw].[dimDateQuarterHourCurrent] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "dimDateQuarterHourCurrent"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          },
+          {
+            "name": "TableWidgetSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"TableWidgetSerialization\"><AnnotationContent><![CDATA[<?xml version=\"1.0\"?>",
+              "<TableWidgetGridSerialization xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+              "  <ColumnSuggestedType />",
+              "  <ColumnFormat />",
+              "  <ColumnAccuracy />",
+              "  <ColumnCurrencySymbol />",
+              "  <ColumnPositivePattern />",
+              "  <ColumnNegativePattern />",
+              "  <ColumnWidths>",
+              "    <item>",
+              "      <key>",
+              "        <string>dateTimeIK</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>120</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>dateTimeHour</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>140</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DateTime</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>107</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DateString</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>113</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>HourOfDay</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>118</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>MinuteOfHour</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>138</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Date</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>71</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Day</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>66</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofYear</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>112</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofWeek</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>118</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofWeekName</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>159</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Week</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>77</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Month</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>83</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>MonthName</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>124</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Quarter</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>93</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Year</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>71</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>IsWeekend</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>116</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>IsLeapYear</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>117</int>",
+              "      </value>",
+              "    </item>",
+              "  </ColumnWidths>",
+              "  <ColumnDisplayIndex>",
+              "    <item>",
+              "      <key>",
+              "        <string>dateTimeIK</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>0</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>dateTimeHour</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>1</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DateTime</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>2</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DateString</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>3</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>HourOfDay</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>4</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>MinuteOfHour</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>5</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Date</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>6</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Day</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>7</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofYear</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>8</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofWeek</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>9</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>DayofWeekName</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>10</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Week</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>11</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Month</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>12</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>MonthName</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>13</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Quarter</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>14</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>Year</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>15</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>IsWeekend</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>16</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>IsLeapYear</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>17</int>",
+              "      </value>",
+              "    </item>",
+              "  </ColumnDisplayIndex>",
+              "  <ColumnFrozen />",
+              "  <ColumnChecked />",
+              "  <ColumnFilter />",
+              "  <SelectionFilter />",
+              "  <FilterParameters />",
+              "  <IsSortDescending>false</IsSortDescending>",
+              "</TableWidgetGridSerialization>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "vfactDeviceMeasurmentByHour",
+        "columns": [
+          {
+            "name": "deviceMeasurementIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "deviceMeasurementIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimDeviceIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimDeviceIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dataPointDateIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dataPointDateIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimLocationIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimLocationIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimStatusListIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimStatusListIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "dimPowerScalesIK",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "dimPowerScalesIK",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "Signal Strength",
+            "dataType": "int64",
+            "sourceColumn": "deviceSignalStrength",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "devicePowerUsage",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "devicePowerUsage",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Power Usage (Watts)",
+            "dataType": "int64",
+            "sourceColumn": "devicePowerUsageWatts",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Sample Size from Sensor",
+            "dataType": "int64",
+            "sourceColumn": "dataPointSampleSize",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "type": "calculated",
+            "name": "Power Usage (kW)",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "[Power Usage (Watts)]/1000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "vfactDeviceMeasurmentByHour",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dw].[vfactDeviceMeasurmentByHour].* FROM [dw].[vfactDeviceMeasurmentByHour] ",
+              "dataSource": "TEQNET-VSQL"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Avg. Signal Strength (Hourly)",
+            "expression": "AVERAGE(vfactDeviceMeasurmentByHour[Signal Strength])"
+          },
+          {
+            "name": "Watt Hours Used",
+            "expression": "SUM(vfactDeviceMeasurmentByHour[Power Usage (Watts)])"
+          },
+          {
+            "name": "Average Sample Size",
+            "expression": "AVERAGE([Sample Size from Sensor])"
+          },
+          {
+            "name": "kW Hours Used",
+            "expression": "SUM(vfactDeviceMeasurmentByHour[Power Usage (kW)])"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dw].[vfactDeviceMeasurmentByHour].* FROM [dw].[vfactDeviceMeasurmentByHour] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "vfactDeviceMeasurmentByHour"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dw"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "7aa3b676-e783-4afa-8c09-4c4cd50eae5b",
+        "fromTable": "Device Usage Data",
+        "fromColumn": "dimDeviceIK",
+        "toTable": "IoT Devices",
+        "toColumn": "deviceIK"
+      },
+      {
+        "name": "08bb2579-3bc1-40c3-9561-910737e784a2",
+        "fromTable": "Device Usage Data",
+        "fromColumn": "dimLocationIK",
+        "toTable": "Device Locations",
+        "toColumn": "LocationIK"
+      },
+      {
+        "name": "22108034-5f67-4f6d-a032-bb1778c4dd64",
+        "fromTable": "Device Usage Data",
+        "fromColumn": "dimPowerScalesIK",
+        "toTable": "Measurements Used",
+        "toColumn": "powerScaleIK"
+      },
+      {
+        "name": "619e756c-74ac-4308-8bf4-fa0940081d3b",
+        "fromTable": "Device Usage Data",
+        "fromColumn": "dimStatusListIK",
+        "toTable": "Device Statuses",
+        "toColumn": "statusIK"
+      },
+      {
+        "name": "ed200fb5-c154-4f7b-a3e0-566d21b295a2",
+        "fromTable": "Device Usage Data",
+        "fromColumn": "dataPointDateIK",
+        "toTable": "Date Dimension",
+        "toColumn": "dateTimeIK"
+      },
+      {
+        "name": "78a41a97-397e-4558-b3b3-e52384f93712",
+        "fromTable": "vfactDeviceMeasurmentByHour",
+        "fromColumn": "dimLocationIK",
+        "toTable": "Device Locations",
+        "toColumn": "LocationIK"
+      },
+      {
+        "name": "547993f2-d47e-4edb-a30b-cc3fc0b953cf",
+        "fromTable": "vfactDeviceMeasurmentByHour",
+        "fromColumn": "dimDeviceIK",
+        "toTable": "IoT Devices",
+        "toColumn": "deviceIK"
+      },
+      {
+        "name": "c5a04803-994a-4d88-b096-bacaa399c4f0",
+        "fromTable": "vfactDeviceMeasurmentByHour",
+        "fromColumn": "dataPointDateIK",
+        "toTable": "Date Dimension",
+        "toColumn": "dateTimeIK"
+      },
+      {
+        "name": "25f03420-12ff-451d-a52d-5605a8ab9a85",
+        "fromTable": "vfactDeviceMeasurmentByHour",
+        "fromColumn": "dimPowerScalesIK",
+        "toTable": "Measurements Used",
+        "toColumn": "powerScaleIK"
+      },
+      {
+        "name": "7b7e3597-634a-4f92-9566-cb134e11d437",
+        "fromTable": "vfactDeviceMeasurmentByHour",
+        "fromColumn": "dimStatusListIK",
+        "toTable": "Device Statuses",
+        "toColumn": "statusIK"
+      }
+    ],
+    "roles": [
+      {
+        "name": "ReadAndProcess",
+        "modelPermission": "readRefresh",
+        "members": [
+          {
+            "memberName": "TEQNET\\SSIS_SVC",
+            "memberId": "S-1-5-21-2585499621-2685007814-3745468765-3611"
+          },
+          {
+            "memberName": "TEQNET\\SQLREPORTER",
+            "memberId": "S-1-5-21-2585499621-2685007814-3745468765-1119"
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "400"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
