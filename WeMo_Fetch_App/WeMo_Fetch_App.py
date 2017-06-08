@@ -1,6 +1,10 @@
 import sqlite3
 import datetime
 import pymssql 
+import logging
+import time
+import socket
+from ouimeaux.utils import get_ip_address
 
 from ouimeaux.environment import Environment
 
@@ -37,7 +41,32 @@ def getDeviceHardwareIDs(Environment):
 
 def aggregateDeviceData(numSecondsForDiscovery, numMinutesToGatherData, fetchDataDelaySeconds, databaseCursor):
     env = Environment()
-    env.start()    
+    test_ip_addr = "127.0.0.1" #get_ip_address()
+    test_port = 54321
+    
+    #Set up a socket using the same port that ouimeaux uses so we can kill it if it's still in use for some reason
+    test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        test_socket.bind((test_ip_addr, test_port))
+    except socket.error as e:
+        if e.errno == 98:
+            print("Port is already in use")
+            exit
+        else:
+            # something else raised the socket.error exception
+            print(e)
+
+    try:
+        env.start()
+    except OSError as err:
+        print("Error Occurred!", err)
+        logging.exception("OSError Occurred when setting up a ouimeaux environment..")
+        env.upnp.server.stop()
+        env.registry.server.stop()
+        del env
+        time.sleep(30)
+        return None
+
     databaseCursor.execute('DELETE FROM switchDataPoints') #Remove any existing data from this table, as it should`ve already been stored elsewhere
     env.discover(numSecondsForDiscovery)
     #print(Environment.list_switches()) #DEBUG: See what devices we grabbed during discovery
@@ -315,11 +344,13 @@ def InsertOrUpdateDatabase(server,username,password,mssqldatabase,currentDataSet
                                 """
                                 )
             mssqldb.commit()
-    except:
+        mssqldb.close() #end of for loop per device    
+    except Exception as e: 
+        print(e)
         print("SQL SERVER LOAD RAN INTO A PROBLEM - CONTINUING...")
         pass #Ideally, error handling should fill an in-memory python buffer that is flushed into the DB when the exception state clears, but this is a home project for data that has little value (unlike, say, money changing hands), so meh.
     print("Finished with MS SQL Server work!")
-    mssqldb.close()
+
 
 if __name__ == "__main__":
     print("")
@@ -333,6 +364,7 @@ try:
     cur = db.cursor()
     init_db(cur)
 
+    logging.basicConfig(level=logging.WARNING, filename='C:\Temp\ouimeauxDEBUG.log')
     numSecondsForDiscovery = 25
     numMinutesToGatherData = 1
     fetchDataDelaySeconds = 10
@@ -342,11 +374,17 @@ try:
     mssqldatabase="Sandbox"
 
     while(1==1):
-        currentDataSet = aggregateDeviceData(numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
-        #print(currentDataSet)
-        #try:
-        InsertOrUpdateDatabase(server,username,password,mssqldatabase,currentDataSet)
-        #except:
+        try:
+            currentDataSet = aggregateDeviceData(numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
+            #print(currentDataSet)
+            #try:
+            if currentDataSet != None: 
+                InsertOrUpdateDatabase(server,username,password,mssqldatabase,currentDataSet)
+            print(datetime.datetime.now())
+        except:
+            logging.exception("Something went wrong!")
+            time.sleep(30)
+            pass
             #print("SQL Server work had a problem!")
             #print(err_text)
             #pass #Ideally, there should be a buffer that gets filled and the data should build until all of it can be flushed into the DB, sucessfully but I'm lazy today (2017-05-20).  Thus, we're just leaving it behind
