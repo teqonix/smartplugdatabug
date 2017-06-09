@@ -4,6 +4,7 @@ import pymssql
 import logging
 import time
 import socket
+import sys
 from ouimeaux.utils import get_ip_address
 
 from ouimeaux.environment import Environment
@@ -51,7 +52,7 @@ def aggregateDeviceData(numSecondsForDiscovery, numMinutesToGatherData, fetchDat
     except socket.error as e:
         if e.errno == 98:
             print("Port is already in use")
-            exit
+            sys.exit(e)
         else:
             # something else raised the socket.error exception
             print(e)
@@ -64,8 +65,7 @@ def aggregateDeviceData(numSecondsForDiscovery, numMinutesToGatherData, fetchDat
         env.upnp.server.stop()
         env.registry.server.stop()
         del env
-        time.sleep(30)
-        return None
+        raise
 
     databaseCursor.execute('DELETE FROM switchDataPoints') #Remove any existing data from this table, as it should`ve already been stored elsewhere
     env.discover(numSecondsForDiscovery)
@@ -376,15 +376,18 @@ try:
     while(1==1):
         try:
             currentDataSet = aggregateDeviceData(numSecondsForDiscovery=numSecondsForDiscovery,numMinutesToGatherData=numMinutesToGatherData,fetchDataDelaySeconds=fetchDataDelaySeconds,databaseCursor=cur)
-            #print(currentDataSet)
+            #if(currentDataSet == -1):
+            #    print("An error occurred in the aggregateDeviceData call!  Exiting..")
+            #    sys.exit()
+            print(currentDataSet)
             #try:
             if currentDataSet != None: 
                 InsertOrUpdateDatabase(server,username,password,mssqldatabase,currentDataSet)
             print(datetime.datetime.now())
         except:
-            logging.exception("Something went wrong!")
-            time.sleep(30)
-            pass
+            errorText = ("Something went wrong on: " , datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            logging.exception(errorText)            #time.sleep(30)
+            sys.exit(1)
             #print("SQL Server work had a problem!")
             #print(err_text)
             #pass #Ideally, there should be a buffer that gets filled and the data should build until all of it can be flushed into the DB, sucessfully but I'm lazy today (2017-05-20).  Thus, we're just leaving it behind
@@ -396,7 +399,3 @@ except (KeyboardInterrupt, SystemExit):
     print("---------------")
     print("Goodbye!")
     print("---------------")
-    # Turn off all switches
-    #for switch in ( env.list_switches() ):
-    #    print("Turning Off: " + switch)
-    #    env.get_switch( switch ).off()

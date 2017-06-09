@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="WeMo_Fetch_App.py" />
+    <Compile Include="WeMo_Fetch_App_Win32Svc.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Database Project\" />
