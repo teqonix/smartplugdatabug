@@ -1,7 +1,0 @@
-﻿<?xml version="1.0"?>
-<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
-  DTS:ObjectName="TEQNET-VSQL.teqnet.org.Sandbox.wemoSSIS"
-  DTS:DTSID="{613D5DE1-1942-449F-B8B5-16E57138738A}"
-  DTS:CreationName="ADO"
-  p1:Salt="ZpvCVD/W+Q=="
-  p1:IV="vlnVRNRuPBA=" xmlns:p1="www.microsoft.com/SqlServer/SSIS">xNk6XRLcEEzPKjGZOJEFXnm3lUo/V/OyrtbsFAuBqsoWK3asDS7uWmSa1drVAAjd+Tib1wqrBw46uevDAFb+TqFQqHqDJ0ViHiQVPfg0/NrTH/MzYBxqcHWaUDD9Mi1wBbzRnS0Ut83xcfyR+KyCV0h6UUluLbgJs7sHee6v2NfagyD8H97+JTmKuXbfesdq1VKl4UBlE/zL8neAmj7DSA71tuopfja5mxIQbIrZxv4madZ6gCqHs11BpnV3nJVtOxRo6oXOqzmqpiBLbMOiFJyf5mQw52+kiJsqQslpWZUD+cGKl1jyG3iEVhQKszRX31xCTRdOoCI6/eLlAxftuXDLCt1jY1V72xZjL8yDDFSIIWm1fHMPxu492eo5PvBSxgHHUVyf9kPdpo84fdvf7d/EyvgGwySo7gtJL29RfwTTGl54HjXEBI5hxsxY0Bmz3ICrNwInzVwBatCOEXeKRKogECP75CWuVFASEM0rEjt++Dim+IcFwB3Z/YOvY4tx9EyGOVBTMQLbvrqBhMF9kiaw6ECTTQqqIihsGdG78F9LkGrxpSRjeu6EdFUWwnI2aFE3ycdcCmeujYNy+VH+ZHFseSN7LppFlISQ1esuE2TwWBZ/PqYy6Qu2DEYWkuGSIItz2tgKxh+vao4ha9WFGQpUVK4Ptl4xyKPcZf5AHilkgRghfM3F9aza5OcQ5TkuLv8SGtT/m+6wTg1xM5JR0l62KxG0+z5d</DTS:ConnectionManager>
