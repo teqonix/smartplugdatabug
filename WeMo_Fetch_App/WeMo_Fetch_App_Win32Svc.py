@@ -2,6 +2,8 @@ import win32service
 import win32serviceutil
 import win32event
 import servicemanager  
+import os
+import traceback
 import sqlite3
 import datetime
 import pymssql 
@@ -36,22 +38,12 @@ class PySvc(win32serviceutil.ServiceFramework):
         logging.basicConfig(level=logging.WARNING, filename='C:\Temp\ouimeauxDEBUG.log')
         try:
             cur = db.cursor()
-            cur.execute('''CREATE TABLE switchDataPoints (
-                    MACAddress TEXT,
-                    IPAddress TEXT,
-                    SignalStrength INTEGER,
-                    SerialNbr TEXT,
-                    ModelNbr TEXT,
-                    FirmwareVersion TEXT,
-                    DeviceName TEXT,
-                    Status INTEGER,
-                    EnergyUse INTEGER
-                    )'''
-            )
+            self.init_db(cur) #Set up the in-memory SQL database we will store and average results in before storing in MSSQL
         except:
             errorText = ("Something went wrong on: " , datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             logging.exception(errorText)            #time.sleep(30)
-            sys.exit(1)        
+            #Force the process to terminate by dividing by zero so that windows gets a non-zero exit code and restarts the service using the inbuilt recovery options (terrible, but this is a hobby project so meh)
+            raise
         rc = None
         secondsForDiscovery=20
         minutesToGatherData=1
@@ -72,18 +64,14 @@ class PySvc(win32serviceutil.ServiceFramework):
                                             ,numSecondsForDiscovery=secondsForDiscovery
                                             ,fetchDataDelaySeconds=delaySeconds
                 )
-                #if(currentDataSet == -1):
-                #    print("An error occurred in the aggregateDeviceData call!  Exiting..")
-                #    sys.exit()
-                #print(currentDataSet)
-                #try:
                 if currentDataSet != None: 
                     self.InsertOrUpdateDatabase(server,username,password,mssqldatabase,currentDataSet)
                 print(datetime.datetime.now())
             except:
+                servicemanager.LogErrorMsg(traceback.format_exc())
                 errorText = ("Something went wrong on: " , datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 logging.exception(errorText)            #time.sleep(30)
-                sys.exit(1)
+                os._exit(-1)#return some value other than 0 to os so that service knows to restart
             # block for 5 seconds and listen for a stop event  
             rc = win32event.WaitForSingleObject(self.hWaitStop, 5000)  
       
@@ -94,20 +82,20 @@ class PySvc(win32serviceutil.ServiceFramework):
         # fire the stop event  
         win32event.SetEvent(self.hWaitStop)  
 
-#    def init_db(cur):
+    def init_db(self, cur):
         #This function will create the database to store our WeMo device data; since this is a simple example, it`s just one table:
-        #cur.execute('''CREATE TABLE switchDataPoints (
-        #                    MACAddress TEXT,
-        #                    IPAddress TEXT,
-        #                    SignalStrength INTEGER,
-        #                    SerialNbr TEXT,
-        #                    ModelNbr TEXT,
-        #                    FirmwareVersion TEXT,
-        #                    DeviceName TEXT,
-        #                    Status INTEGER,
-        #                    EnergyUse INTEGER
-        #                )'''
-        #)
+        cur.execute('''CREATE TABLE switchDataPoints (
+                            MACAddress TEXT,
+                            IPAddress TEXT,
+                            SignalStrength INTEGER,
+                            SerialNbr TEXT,
+                            ModelNbr TEXT,
+                            FirmwareVersion TEXT,
+                            DeviceName TEXT,
+                            Status INTEGER,
+                            EnergyUse INTEGER
+                        )'''
+        )
 
     def getDeviceHardwareIDs(self, Environment):
         deviceHardwareData = [] 
@@ -134,7 +122,7 @@ class PySvc(win32serviceutil.ServiceFramework):
         except socket.error as e:
             if e.errno == 98:
                 print("Port is already in use")
-                sys.exit(e)
+                t = 1/0 
             else:
                 # something else raised the socket.error exception
                 print(e)
