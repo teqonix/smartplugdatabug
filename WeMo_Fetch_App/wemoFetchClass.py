@@ -39,13 +39,25 @@ class localNetworkWemoFetcher:
         devicehardwaredata = []
         for switchStr in (self.wemoenvironment.list_switches()):
             currentswitch = self.wemoenvironment.get_switch(switchStr)
-            switchmac = currentswitch.basicevent.GetMacAddr()
-            switchudnlowercase = switchmac['PluginUDN'].lower()
-            switchfirmwareversion = currentswitch.firmwareupdate.GetFirmwareVersion()
+            dict_switchinfo = currentswitch.basicevent.GetMacAddr()
+            switchmac = dict_switchinfo.get("MacAddr")
+            switchudnlowercase = dict_switchinfo.get("PluginUDN").lower()
+            dict_switchfirmwareversion = currentswitch.firmwareupdate.GetFirmwareVersion()
+            switchfirmwareversion = dict_switchfirmwareversion.get("FirmwareVersion")
             switchipaddress = currentswitch.host
             switchserialnumber = currentswitch.serialnumber
             switchmodelnbr = currentswitch.model
-            devicehardwaredata.append([switchmac, switchudnlowercase, switchfirmwareversion, switchipaddress, switchserialnumber, switchmodelnbr])
+            dict_currentswitchattributes = {
+                "MAC Address": switchmac,
+                "Universal Unique Identifier": switchudnlowercase,
+                "Firmware Version": switchfirmwareversion,
+                "IP Address": switchipaddress,
+                "Serial Number": switchserialnumber,
+                "Model Number:": switchmodelnbr
+            }
+            devicehardwaredata.append(
+                dict_currentswitchattributes
+            )
         return devicehardwaredata
 
     # def aggregatedevicedata(self, numSecondsForDiscovery, numMinutesToGatherData, fetchDataDelaySeconds, databaseCursor):
