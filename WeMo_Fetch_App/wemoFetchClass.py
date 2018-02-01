@@ -9,8 +9,7 @@ from ouimeaux.utils import get_ip_address
 from ouimeaux.environment import Environment
 
 class localNetworkWemoFetcher:
-
-    def __init__(self):
+    def __init__(self,config_params):
         # We will use an in-memory database & table to store and aggregate our data we've pulled from our WeMo devices
         self.db = sqlite3.connect(':memory:')
         self.cur = self.db.cursor()
@@ -29,6 +28,7 @@ class localNetworkWemoFetcher:
                             )'''
                         )
         self.wemoenvironment = Environment()
+        self.config = config_params
 
     def getDeviceHardwareIDs(self, environment):
         current_switches = self.wemoenvironment.list_switches()

@@ -199,13 +199,7 @@ if __name__ == "__main__":
 try:
 
     logging.basicConfig(level=logging.WARNING, filename='C:\Temp\ouimeauxDEBUG.log')
-    numSecondsForDiscovery = 25
-    numMinutesToGatherData = 1
-    fetchDataDelaySeconds = 10
-    server="10.0.60.25"
-    username="ouimeaux"
-    password="Gj37fAGje_@"
-    mssqldatabase="Sandbox"
+
 
     while(1==1):
         try:
