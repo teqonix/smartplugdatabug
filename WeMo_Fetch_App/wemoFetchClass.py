@@ -5,13 +5,18 @@ import logging
 import time
 import socket
 import sys
+import uuid
+import os
+import atexit
 from ouimeaux.utils import get_ip_address
 from ouimeaux.environment import Environment
 
-class localNetworkWemoFetcher:
+class LocalNetworkWemoFetcher:
+
     def __init__(self,config_params):
         # We will use an in-memory database & table to store and aggregate our data we've pulled from our WeMo devices
-        self.db = sqlite3.connect(':memory:')
+        self.dbfile = str(uuid.uuid4()) + ".db"
+        self.db = sqlite3.connect(self.dbfile)
         self.cur = self.db.cursor()
         # This function will create the database to store our WeMo device data;
         # since this is a simple example, it`s just one table:
@@ -59,6 +64,10 @@ class localNetworkWemoFetcher:
                 dict_currentswitchattributes
             )
         return devicehardwaredata
+
+    def closeconnection(self):
+        self.db.close()
+        os.remove(self.dbfile)
 
     # def aggregatedevicedata(self, numSecondsForDiscovery, numMinutesToGatherData, fetchDataDelaySeconds, databaseCursor):
     #     test_ip_addr = "127.0.0.1"  # get_ip_address()

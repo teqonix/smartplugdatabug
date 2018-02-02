@@ -20,8 +20,10 @@ if __name__ == "__main__":
         "Delay in Seconds When Fetching Data": config.get('API Parameters', 'fetchdatadelayseconds'),
     }
 
-    testObject = wemoFetchClass.localNetworkWemoFetcher(localdb_config_parameters)
+    testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
 
     currentdevices = testObject.getDeviceHardwareIDs(testObject.wemoenvironment)
 
     print(currentdevices)
+
+    testObject.closeconnection()
