@@ -29,7 +29,20 @@ class LocalNetworkWemoFetcher:
                             FirmwareVersion TEXT,
                             DeviceName TEXT,
                             Status INTEGER,
-                            EnergyUse INTEGER
+                            EnergyUse INTEGER,
+                            DateDataFetched DATE
+                            )'''
+                        )
+        self.cur.execute('''CREATE TABLE averagedDataPoints (
+                            MACAddress TEXT,
+                            IPAddress TEXT,
+                            SignalStrength INTEGER,
+                            SerialNbr TEXT,
+                            ModelNbr TEXT,
+                            FirmwareVersion TEXT,
+                            DeviceName TEXT,
+                            Status INTEGER,
+                            AvgEnergyUse INTEGER,
                             DateDataFetched DATE
                             )'''
                         )
@@ -66,7 +79,7 @@ class LocalNetworkWemoFetcher:
                 "Firmware Version": switchfirmwareversion,
                 "IP Address": switchipaddress,
                 "Serial Number": switchserialnumber,
-                "Model Number:": switchmodelnbr
+                "Model Number": switchmodelnbr
             }
             devicehardwaredata.append(
                 dict_currentswitchattributes
@@ -91,16 +104,45 @@ class LocalNetworkWemoFetcher:
                 currentSwitch = self.wemoenvironment.get_switch(wemoDevice.get("Device Name"))
                 print(currentSwitch)
                 switchsignalstrength = currentSwitch.basicevent.GetSignalStrength()
-                switchcurrentstate = currentSwitch.basicevent.GetBinaryState()
+                switchcurrentbinarystate = currentSwitch.basicevent.GetBinaryState()
                 switchhwinfo = currentSwitch.metainfo.GetMetaInfo()
                 switchmanufacture= currentSwitch.manufacture.GetManufactureData()
                 if currentSwitch.model.find('Insight') > 0:
                     if currentSwitch.insight_params.get("state") == 0:
+                        #API sometimes show power usage when turned off; force usage to zero when off
                         switchpowerconsumption = 0
                     else: switchpowerconsumption = currentSwitch.current_power
                     switchcurrentstate = currentSwitch.insight_params.get("state")
+                datatoinsert = (
+                    wemoDevice.get("MAC Address"),
+                    wemoDevice.get("IP Address"),
+                    float(switchsignalstrength.get("SignalStrength")),
+                    wemoDevice.get("Serial Number"),
+                    wemoDevice.get("Model Number"),
+                    wemoDevice.get("Firmware Version"),
+                    wemoDevice.get("Device Name"),
+                    int(switchcurrentbinarystate.get("BinaryState")),
+                    switchpowerconsumption
+                )
+                logging.info(datatoinsert)
+                self.cur.execute(
+                    '''INSERT INTO switchDataPoints(
+                            MACAddress
+                            , IPAddress
+                            , SignalStrength
+                            , SerialNbr
+                            , ModelNbr
+                            , FirmwareVersion
+                            , DeviceName
+                            , Status
+                            , EnergyUse
+                            , DateDataFetched
+                        ) VALUES (?,?,?,?,?,?,?,?,?, datetime('now'))''',
+                     datatoinsert)  # This method must iterate through the list and replace the variables (?'s) in the INSERT statement from left to right
+                self.db.commit()
                 derp = 1
             self.wemoenvironment.wait(self.config.get("Delay in Seconds When Fetching Data"))
+        derp = 2
 
 
                 # if deviceHardwareData[currentSwitchHardwareIndex][1].find('insight') > 0:
@@ -137,10 +179,7 @@ class LocalNetworkWemoFetcher:
         # currentPowerSum = 0
         # for powerDataPoint in switchPowerDataArray:
         #     currentPowerSum = currentPowerSum + powerDataPoint[8]
-        #     databaseCursor.execute(
-        #         'INSERT INTO switchDataPoints(MACAddress, IPAddress, SignalStrength, SerialNbr, ModelNbr, FirmwareVersion, DeviceName, Status, EnergyUse) VALUES (?,?,?,?,?,?,?,?,?)',
-        #         powerDataPoint)  # This method must iterate through the list and replace the variables (?'s) in the INSERT statement from left to right
-        #     db.commit()
+
             # print(powerDataPoint)
         # Average out the data points collected throughout looping through the above logic and group it by device.  This will go into the permanent database.
         # tableQuery = """SELECT
