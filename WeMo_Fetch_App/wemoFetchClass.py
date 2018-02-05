@@ -91,7 +91,7 @@ class LocalNetworkWemoFetcher:
         self.db.close()
         os.remove(self.dbfile)
 
-    def aggregatedevicedata(self):
+    def fetchdevicedata(self):
         # print(Environment.list_switches()) #DEBUG: See what devices we grabbed during discovery
         switchPowerDataArray = []  # We will store a list of power measurements in this list and then average them before sending them to a flat file or database (we don`t need 300 measurements per minute stored in the database; it should be flattened out)
         # Fetch the current date/time into a variable, then find the date/time one minute from now; we'll use that
@@ -144,6 +144,36 @@ class LocalNetworkWemoFetcher:
             self.wemoenvironment.wait(self.config.get("Delay in Seconds When Fetching Data"))
         derp = 2
 
+    def aggregateusagedata(self):
+        self.cur.execute(
+            '''INSERT INTO averagedDataPoints
+                    SELECT
+                            MACAddress
+                            , MAX(IPAddress) AS IPAddress
+                            , MIN(SignalStrength) AS SignalStrength
+                            , SerialNbr
+                            , MAX(ModelNbr) AS ModelNbr
+                            , MAX(FirmwareVersion) AS FirmwareVersion
+                            , DeviceName AS DeviceName
+                            , MAX(Status) AS Status
+                            , AVG(EnergyUse) AS EnergyUse
+                            , datetime('now') AS DataPulledDate
+                    FROM switchDataPoints
+                    GROUP BY MACAddress, SerialNbr, DeviceName
+            '''
+        )
+        self.db.commit()
+        self.cur.execute(
+            # Clear the ongoing log as we've already summarized and stored the averaged usage data
+            '''DELETE FROM switchDataPoints'''
+        )
+
+        tablequery = '''SELECT * FROM averagedDataPoints'''
+
+        returnusagedata = []
+        for dataRow in self.cur.execute(tablequery):
+            returnusagedata.append(dataRow)
+        return returnusagedata
 
                 # if deviceHardwareData[currentSwitchHardwareIndex][1].find('insight') > 0:
                     # print("Insight switch found!")

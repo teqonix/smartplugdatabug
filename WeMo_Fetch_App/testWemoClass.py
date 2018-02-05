@@ -34,7 +34,13 @@ if __name__ == "__main__":
         testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
         currentdevices = testObject.getDeviceHardwareIDs(testObject.wemoenvironment)
         print(currentdevices)
-        testObject.aggregatedevicedata()
-        testObject.closeconnection()
+        testObject.fetchdevicedata()
+        datatoload = testObject.aggregateusagedata()
+        derp = 3
 
     print("Ending program.  Infinite loop param: " + str(infiniteloop_param))
+
+    try:
+        testObject.closeconnection()
+    except NameError:
+        pass
