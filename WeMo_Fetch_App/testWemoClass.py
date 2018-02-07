@@ -1,3 +1,5 @@
+from uu import test
+
 import wemoFetchClass
 import ConfigParser
 import logging
@@ -36,6 +38,7 @@ if __name__ == "__main__":
         print(currentdevices)
         testObject.fetchdevicedata()
         datatoload = testObject.aggregateusagedata()
+        testObject.InsertOrUpdateDatabase(datatoload)
         derp = 3
 
     print("Ending program.  Infinite loop param: " + str(infiniteloop_param))

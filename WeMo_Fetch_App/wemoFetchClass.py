@@ -43,6 +43,7 @@ class LocalNetworkWemoFetcher:
                             DeviceName TEXT,
                             Status INTEGER,
                             AvgEnergyUse INTEGER,
+                            CountDataPoints INTEGER,
                             DateDataFetched DATE
                             )'''
                         )
@@ -157,6 +158,7 @@ class LocalNetworkWemoFetcher:
                             , DeviceName AS DeviceName
                             , MAX(Status) AS Status
                             , AVG(EnergyUse) AS EnergyUse
+                            , COUNT(0) AS DataPointsCollected 
                             , datetime('now') AS DataPulledDate
                     FROM switchDataPoints
                     GROUP BY MACAddress, SerialNbr, DeviceName
@@ -168,91 +170,227 @@ class LocalNetworkWemoFetcher:
             '''DELETE FROM switchDataPoints'''
         )
 
-        tablequery = '''SELECT * FROM averagedDataPoints'''
+        tablequery = '''SELECT                             
+                            ROWID
+                            ,MACAddress
+                            ,IPAddress
+                            ,SignalStrength
+                            ,SerialNbr 
+                            ,ModelNbr
+                            ,FirmwareVersion
+                            ,DeviceName
+                            ,Status
+                            ,AvgEnergyUse
+                            ,CountDataPoints
+                            ,DateDataFetched
+                        FROM averagedDataPoints'''
 
         returnusagedata = []
         for dataRow in self.cur.execute(tablequery):
-            returnusagedata.append(dataRow)
+            rowdict = {
+                "SQLite3 - averagedDataPoints Row ID": dataRow[0]
+                ,"MAC Address": dataRow[1]
+                ,"IP Address": dataRow[2]
+                ,"Signal Strength": dataRow[3]
+                , "Serial Number": dataRow[4]
+                , "Model Number": dataRow[5]
+                , "Firmware Version": dataRow[6]
+                , "Device Name": dataRow[7]
+                , "Device Status": dataRow[8]
+                , "Average Energy Usage": dataRow[9]
+                , "Data Points Collected": dataRow[10]
+                , "Date Stamp for Data": dataRow[11]
+            }
+            returnusagedata.append(rowdict)
         return returnusagedata
 
-                # if deviceHardwareData[currentSwitchHardwareIndex][1].find('insight') > 0:
-                    # print("Insight switch found!")
-                    # print( currentSwitch.insight_params.keys() )
-                    # print( currentSwitch.insight_params.values() )
-            #         currentSwitch.insight.GetInsightParams()
-            #         if switchCurrentState[
-            #             'BinaryState'] == '0':  # There seems to be a bug in the Ouimeaux API that keeps returning energy usage when a plug is off; it seems rare, but it is happening in the data
-            #             insightCurrentPower = 0
-            #         else:
-            #             insightCurrentPower = currentSwitch.insight_params['currentpower']
-            #         switchPowerDataArray.append([deviceHardwareData[currentSwitchHardwareIndex][0]['MacAddr']
-            #                                         , deviceHardwareData[currentSwitchHardwareIndex][3]
-            #                                         , switchSignalStrength['SignalStrength']
-            #                                         , deviceHardwareData[currentSwitchHardwareIndex][0]['SerialNo']
-            #                                         , deviceHardwareData[currentSwitchHardwareIndex][5]
-            #                                         , deviceHardwareData[currentSwitchHardwareIndex][2]['FirmwareVersion']
-            #                                         , switchStr
-            #                                         , switchCurrentState['BinaryState']
-            #                                         , insightCurrentPower]
-            #                                     )
-            #     exportDataString = ([deviceHardwareData[currentSwitchHardwareIndex][0]['MacAddr'],
-            #                          deviceHardwareData[currentSwitchHardwareIndex][3],
-            #                          switchSignalStrength['SignalStrength'],
-            #                          deviceHardwareData[currentSwitchHardwareIndex][0]['SerialNo'],
-            #                          deviceHardwareData[currentSwitchHardwareIndex][5],
-            #                          deviceHardwareData[currentSwitchHardwareIndex][2]['FirmwareVersion'], switchStr,
-            #                          switchCurrentState['BinaryState'], insightCurrentPower])
-            #     print(exportDataString)
-            # currentLoopIteration = currentLoopIteration + 1
-            # env.wait(fetchDataDelaySeconds)
-            # print("Current loop count: " + str(currentLoopIteration))
-        # currentPowerSum = 0
-        # for powerDataPoint in switchPowerDataArray:
-        #     currentPowerSum = currentPowerSum + powerDataPoint[8]
+    def InsertOrUpdateDatabase(self,currentDataSet):
+        try:
+            #Connect to the MS SQL Server instance the database application is stored:
+            mssqldb = pymssql.connect(
+                self.config.get("server_ip")
+                , self.config.get("serviceaccount")
+                , self.config.get("db_password")
+                , self.config.get("databasename")
+            )
+            mssqlcursor = mssqldb.cursor()
+            for currentDataRow in currentDataSet:
+                print("Beginning work in MS SQL Server for ", currentDataRow.get("Device Name"))
+                #First, we need to fill the lookup tables before we can start filling the tables with FK's to the lookups:
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.deviceFirmware AS target
+                            USING (SELECT 
+                                        %s AS firmwareName
+                                ) AS source (firmwareName)
+                            ON (target.firmwareName = source.firmwareName)
+                            WHEN MATCHED THEN 
+                                UPDATE SET target.firmwareName = source.firmwareName
+                            WHEN NOT MATCHED THEN 
+                                INSERT (firmwareName)
+                                VALUES(source.firmwareName)
+                            OUTPUT inserted.[deviceFirmwareSK] --This will return the new or fetched SK back to the calling client (Yay!!)
+                            ;                    
+                """,currentDataRow.get("Firmware Version")) #http://stackoverflow.com/questions/3410455/how-do-i-use-sql-parameters-with-python
+                currentFirmwareSK = mssqlcursor.fetchone()
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.networkMetadata AS target
+                            USING (SELECT 
+                                        %s AS ipAddress
+                                        ,%s AS tcpIPversion
+                                ) AS source (ipAddress, tcpIPversion)
+                            ON (target.ipAddress = source.ipAddress)
+                            WHEN MATCHED THEN 
+                                UPDATE SET target.ipAddress = source.ipAddress, target.tcpIPversion = source.tcpIPversion
+                            WHEN NOT MATCHED THEN 
+                                INSERT (ipAddress, tcpIPversion)
+                                VALUES(source.ipAddress, source.tcpIPversion)
+                            OUTPUT inserted.[networkMetadataSK]
+                            ;                    
+                """,(currentDataRow.get("IP Address"),'IPv4'))
+                currentNetworkMetadataSK = mssqlcursor.fetchone()
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.deviceTypes AS target
+                            USING (SELECT 
+                                        %s AS deviceTypeLabel
+                                ) AS source (deviceTypeLabel)
+                            ON (target.deviceTypeLabel = source.deviceTypeLabel)
+                            WHEN MATCHED THEN 
+                                UPDATE SET target.deviceTypeLabel= source.deviceTypeLabel
+                            WHEN NOT MATCHED THEN 
+                                INSERT (deviceTypeLabel)
+                                VALUES(source.deviceTypeLabel)
+                            OUTPUT inserted.[deviceTypeSK]
+                            ;                    
+                """,(currentDataRow.get("Model Number")))
+                currentDeviceTypeSK = mssqlcursor.fetchone()
+                #Now that we have the SK's for our lookups, upsert into the IoTDevice table:
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.IoTDevice AS target
+                            USING (SELECT 
+                                        %s AS macAddress
+                                        ,%s AS serialNumber
+                                        ,%s AS friendlyName
+                                        ,%s AS deviceTypeFK
+                                        ,%s AS deviceFirmwareFK
+                                        ,%s AS deviceIPAddressFK
+                                        ,0 AS retiredDevice --If this merge statment is being called from the python app, then obviously the device is active
+                                ) AS source (
+                                       macAddress
+                                       ,serialNumber
+                                       ,friendlyName
+                                       ,deviceTypeFK
+                                       ,deviceFirmwareFK
+                                       ,deviceIPAddressFK
+                                       ,retiredDevice
+                               )
+                            ON (
+                                target.macAddress = source.macAddress 
+                                AND target.serialNumber = source.serialNumber
+                            )
+                            --Honestly, this is bad code; you should likely return a SELECT to the application to see if an UPDATE is necessary. This will UPDATE a device record every time the application has data from a device.  Lots and lots of unnecessary writes.
+                            WHEN MATCHED THEN 
+                                UPDATE SET 
+                                    target.macAddress = source.macAddress
+                                    , target.serialNumber = source.serialNumber
+                                    , target.friendlyName = source.friendlyName
+                                    , target.deviceTypeFK = source.deviceTypeFK
+                                    , target.deviceFirmwareFK = source.deviceFirmwareFK
+                                    , target.deviceIPAddressFK = source.deviceIPAddressFK
+                                    , target.retiredDevice = source.retiredDevice
+                                    , target.deviceChangedDate = getdate()
+                            WHEN NOT MATCHED THEN 
+                                INSERT (
+                                       macAddress
+                                       ,serialNumber
+                                       ,friendlyName
+                                       ,deviceTypeFK
+                                       ,deviceFirmwareFK
+                                       ,deviceIPAddressFK
+                                       ,retiredDevice
+                                       ,deviceChangedDate
+                                )
+                                VALUES(
+                                    source.macAddress
+                                    , source.serialNumber
+                                    , source.friendlyName
+                                    , source.deviceTypeFK
+                                    , source.deviceFirmwareFK
+                                    , source.deviceIPAddressFK
+                                    , source.retiredDevice
+                                    , getDate()
+                                )
+                            OUTPUT inserted.[deviceSK]
+                            ;                    
+                """,(currentDataRow.get("MAC Address"),currentDataRow.get("Serial Number"),currentDataRow.get("Device Name"),currentDeviceTypeSK,currentFirmwareSK,currentNetworkMetadataSK))
+                currentDeviceSK = mssqlcursor.fetchone()
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.powerScales AS target
+                            USING (SELECT 
+                                        %s AS unitOfPower 
+                                ) AS source (unitOfPower)
+                            ON (target.unitOfPower = source.unitOfPower)
+                            WHEN MATCHED THEN 
+                                UPDATE SET target.unitOfPower = source.unitOfPower
+                                           ,target.scaleChangedDate = getdate()
+                            WHEN NOT MATCHED THEN 
+                                INSERT (unitOfPower, scaleAddedDate)
+                                VALUES(source.unitOfPower, getdate())
+                            OUTPUT inserted.powerScaleSK
+                            ;                    
+                """,('Milliwatt'))
+                currentPowerScaleSK = mssqlcursor.fetchone()
+                mssqlcursor.execute("""
+                            MERGE INTO Sandbox.dbo.statusList AS target
+                            USING (SELECT 
+                                        %s AS statusNumberRepresentation
+                                        ,%s AS sourceSystem
+                                ) AS source (statusNumberRepresentation, sourceSystem)
+                            ON (
+                                target.statusNumberRepresentation = source.statusNumberRepresentation
+                                AND target.sourceSystem = source.sourceSystem
+                            )
+                            WHEN MATCHED THEN 
+                                UPDATE SET target.statusNumberRepresentation = source.statusNumberRepresentation
+                                           ,target.sourceSystem = source.sourceSystem
+                                           ,target.statusChangedDate = getdate()
+                            WHEN NOT MATCHED THEN 
+                                INSERT (statusNumberRepresentation, sourceSystem, statusAddedDate)
+                                VALUES(source.statusNumberRepresentation, source.sourceSystem, getdate())
+                            OUTPUT inserted.statusSK
+                            ;                    
+                """,(currentDataRow.get("Device Status"),'OuimeauxPython'))
+                currentstatusSK = mssqlcursor.fetchone()
+                #Now that we've filled all the lookup tables for the device itself, we can store the usage data for that device (after ensuring that
+                mssqlcursor.execute("""
+                                    INSERT INTO Sandbox.dbo.deviceUsageData (
+                                                     deviceFK
+                                                     ,deviceSignalStrength
+                                                     ,deviceStateFK
+                                                     ,devicePowerUsage
+                                                     ,devicePowerScaleFK
+                                                     ,dataPointSampleSize
+                                                     ,dataPointAddedDate
+                                        )
+                                    VALUES(
+                                             %s 
+                                            ,%s
+                                            ,%s
+                                            ,%s
+                                            ,%s
+                                            ,%s
+                                            ,getdate()
+                                    )
+                                    ;           
+                """,(currentDeviceSK, currentDataRow.get("Signal Strength"), currentstatusSK, currentDataRow.get("Average Energy Usage"), currentPowerScaleSK, currentDataRow.get("Data Points Collected")))
+                mssqlcursor.execute("""
+                                        COMMIT;
+                                    """
+                                    )
+                mssqldb.commit()
 
-            # print(powerDataPoint)
-        # Average out the data points collected throughout looping through the above logic and group it by device.  This will go into the permanent database.
-        # tableQuery = """SELECT
-        #                     MACAddress
-        #                     , MAX(IPAddress) AS IPAddress
-        #                     , MIN(SignalStrength) AS SignalStrength
-        #                     , SerialNbr
-        #                     , MAX(ModelNbr) AS ModelNbr
-        #                     , MAX(FirmwareVersion) AS FirmwareVersion
-        #                     , MIN(DeviceName) AS DeviceName
-        #                     , MAX(Status) AS Status
-        #                     , AVG(EnergyUse) AS EnergyUse
-        #                     , COUNT(0) AS dataPointsAggregated
-        #                     , datetime(datetime(), 'localtime') AS DataPulledDate
-        #             FROM switchDataPoints
-        #             GROUP BY MACAddress, SerialNbr"""
-        # returnData = []
-        # for dataRow in databaseCursor.execute(tableQuery):
-        #     returnData.append(dataRow)
-        #
-        # tableQuery = """
-        #                  SELECT
-        #                     MACAddress,
-        #                     IPAddress,
-        #                     SignalStrength,
-        #                     SerialNbr,
-        #                     ModelNbr,
-        #                     FirmwareVersion,
-        #                     DeviceName,
-        #                     Status,
-        #                     EnergyUse
-        #                  FROM switchDataPoints
-        #              """
-        # Debug query and output to see detail data in the database table:
-        # for detailData in databaseCursor.execute(tableQuery):
-        #    print(detailData)
-
-        # I had to manually kill the UPnP server and remove the ouimeaux environment in order to fetch the
-        #    device name in case it changed since the last call to this function
-        # env.upnp.server.stop()
-        # env.registry.server.stop()
-        # del env
-        # return returnData
-
-    # databaseCursor.execute(
-    #     'DELETE FROM switchDataPoints')  # Remove any existing data from this table, as it should`ve already been stored elsewhere
+            mssqldb.close() #end of for loop per device
+        except Exception as e:
+            print(e)
+            print("SQL SERVER LOAD RAN INTO A PROBLEM - CONTINUING...")
+            pass #Ideally, error handling should fill an in-memory python buffer that is flushed into the DB when the exception state clears, but this is a home project for data that has little value (unlike, say, money changing hands), so meh.
+        print("Finished with MS SQL Server work!")
