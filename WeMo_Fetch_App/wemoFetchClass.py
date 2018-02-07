@@ -218,7 +218,7 @@ class LocalNetworkWemoFetcher:
                 print("Beginning work in MS SQL Server for ", currentDataRow.get("Device Name"))
                 #First, we need to fill the lookup tables before we can start filling the tables with FK's to the lookups:
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.deviceFirmware AS target
+                            MERGE INTO dbo.deviceFirmware AS target
                             USING (SELECT 
                                         %s AS firmwareName
                                 ) AS source (firmwareName)
@@ -233,7 +233,7 @@ class LocalNetworkWemoFetcher:
                 """,currentDataRow.get("Firmware Version")) #http://stackoverflow.com/questions/3410455/how-do-i-use-sql-parameters-with-python
                 currentFirmwareSK = mssqlcursor.fetchone()
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.networkMetadata AS target
+                            MERGE INTO dbo.networkMetadata AS target
                             USING (SELECT 
                                         %s AS ipAddress
                                         ,%s AS tcpIPversion
@@ -249,7 +249,7 @@ class LocalNetworkWemoFetcher:
                 """,(currentDataRow.get("IP Address"),'IPv4'))
                 currentNetworkMetadataSK = mssqlcursor.fetchone()
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.deviceTypes AS target
+                            MERGE INTO dbo.deviceTypes AS target
                             USING (SELECT 
                                         %s AS deviceTypeLabel
                                 ) AS source (deviceTypeLabel)
@@ -265,7 +265,7 @@ class LocalNetworkWemoFetcher:
                 currentDeviceTypeSK = mssqlcursor.fetchone()
                 #Now that we have the SK's for our lookups, upsert into the IoTDevice table:
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.IoTDevice AS target
+                            MERGE INTO dbo.IoTDevice AS target
                             USING (SELECT 
                                         %s AS macAddress
                                         ,%s AS serialNumber
@@ -324,7 +324,7 @@ class LocalNetworkWemoFetcher:
                 """,(currentDataRow.get("MAC Address"),currentDataRow.get("Serial Number"),currentDataRow.get("Device Name"),currentDeviceTypeSK,currentFirmwareSK,currentNetworkMetadataSK))
                 currentDeviceSK = mssqlcursor.fetchone()
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.powerScales AS target
+                            MERGE INTO dbo.powerScales AS target
                             USING (SELECT 
                                         %s AS unitOfPower 
                                 ) AS source (unitOfPower)
@@ -340,7 +340,7 @@ class LocalNetworkWemoFetcher:
                 """,('Milliwatt'))
                 currentPowerScaleSK = mssqlcursor.fetchone()
                 mssqlcursor.execute("""
-                            MERGE INTO Sandbox.dbo.statusList AS target
+                            MERGE INTO dbo.statusList AS target
                             USING (SELECT 
                                         %s AS statusNumberRepresentation
                                         ,%s AS sourceSystem
@@ -362,7 +362,7 @@ class LocalNetworkWemoFetcher:
                 currentstatusSK = mssqlcursor.fetchone()
                 #Now that we've filled all the lookup tables for the device itself, we can store the usage data for that device (after ensuring that
                 mssqlcursor.execute("""
-                                    INSERT INTO Sandbox.dbo.deviceUsageData (
+                                    INSERT INTO dbo.deviceUsageData (
                                                      deviceFK
                                                      ,deviceSignalStrength
                                                      ,deviceStateFK
@@ -387,7 +387,7 @@ class LocalNetworkWemoFetcher:
                                     """
                                     )
                 mssqldb.commit()
-
+                self.cur.execute("DELETE FROM averagedDataPoints WHERE ROWID = ?", (int(currentDataRow.get("SQLite3 - averagedDataPoints Row ID")),))
             mssqldb.close() #end of for loop per device
         except Exception as e:
             print(e)
