@@ -9,7 +9,7 @@ if __name__ == "__main__":
     print("Object oriented test of Local Wemo Fetch Project")
     print("---------------")
 
-    logging.basicConfig(level=logging.INFO, filename='./wemoLinuxLog.log')
+    logging.basicConfig(level=logging.ERROR, filename='./wemoLinuxLog.log')
 
     config = ConfigParser.ConfigParser()
     config.readfp(open(r'config.cfg'))
@@ -27,19 +27,30 @@ if __name__ == "__main__":
         "Delay in Seconds When Fetching Data": float(config.get('API Parameters', 'fetchdatadelayseconds')),
     }
 
-    while infiniteloop_param == 1:
-        #Check to see if the program should continue running based on the config:
-        config.readfp(open(r'config.cfg'))
-        infiniteloop_param = int(config.get('LOOP BREAKER', 'infiniteloop'))
+    #Instantiate object to do all our work:
+    testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
 
-        #Fetch wemo data:
-        testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
-        currentdevices = testObject.getDeviceHardwareIDs(testObject.wemoenvironment)
-        print(currentdevices)
-        testObject.fetchdevicedata()
-        datatoload = testObject.aggregateusagedata()
-        testObject.InsertOrUpdateDatabase(datatoload)
-        derp = 3
+    while infiniteloop_param == 1:
+        try:
+            #Check to see if the program should continue running based on the config:
+            config.readfp(open(r'config.cfg'))
+            infiniteloop_param = int(config.get('LOOP BREAKER', 'infiniteloop'))
+            print("Infinite loop still in effect? " + str(infiniteloop_param))
+
+            #Fetch wemo data:
+            currentdevices = testObject.getDeviceHardwareIDs(testObject.wemoenvironment)
+            print(currentdevices)
+            testObject.fetchdevicedata()
+            datatoload = testObject.aggregateusagedata()
+            print("Rows in local cache: " + str(len(datatoload))) #Show how many rows are in cache waiting to go to external DBMS
+            try:
+                testObject.InsertOrUpdateDatabase(datatoload)
+            except Exception as e:
+                logging.exception(str(e.message))
+                pass
+        except Exception as e:
+            logging.exception("Unknown error in Python application: " + str(e.message))
+            print
 
     print("Ending program.  Infinite loop param: " + str(infiniteloop_param))
 

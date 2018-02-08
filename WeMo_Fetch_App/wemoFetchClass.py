@@ -51,7 +51,7 @@ class LocalNetworkWemoFetcher:
             self.wemoenvironment = Environment()
             self.wemoenvironment.start()
             self.wemoenvironment.discover(config_params.get("Seconds For Environment Discovery"))
-        except:
+        except Exception as e:
             logging.exception("Failed to initialize new instance of LocalNetworkWemoFetcher!  Ouimeaux environment did not start correctly!")
             raise
         self.config = config_params
@@ -390,7 +390,6 @@ class LocalNetworkWemoFetcher:
                 self.cur.execute("DELETE FROM averagedDataPoints WHERE ROWID = ?", (int(currentDataRow.get("SQLite3 - averagedDataPoints Row ID")),))
             mssqldb.close() #end of for loop per device
         except Exception as e:
-            print(e)
-            print("SQL SERVER LOAD RAN INTO A PROBLEM - CONTINUING...")
-            pass #Ideally, error handling should fill an in-memory python buffer that is flushed into the DB when the exception state clears, but this is a home project for data that has little value (unlike, say, money changing hands), so meh.
+            logging.exception("ERROR IN LOADING DATABASE WITH CACHED DATA: " + str(e.message))
+            raise #Ideally, error handling should fill an in-memory python buffer that is flushed into the DB when the exception state clears, but this is a home project for data that has little value (unlike, say, money changing hands), so meh.
         print("Finished with MS SQL Server work!")
