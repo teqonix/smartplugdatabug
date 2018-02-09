@@ -3,6 +3,7 @@ from uu import test
 import wemoFetchClass
 import ConfigParser
 import logging
+import datetime
 
 if __name__ == "__main__":
     print("")
@@ -37,20 +38,37 @@ if __name__ == "__main__":
             infiniteloop_param = int(config.get('LOOP BREAKER', 'infiniteloop'))
             print("Infinite loop still in effect? " + str(infiniteloop_param))
 
+            #Start the ouimeaux environment:
+            testObject.startStopWemoEnvironment("start")
+
             #Fetch wemo data:
             currentdevices = testObject.getDeviceHardwareIDs(testObject.wemoenvironment)
             print(currentdevices)
             testObject.fetchdevicedata()
             datatoload = testObject.aggregateusagedata()
             print("Rows in local cache: " + str(len(datatoload))) #Show how many rows are in cache waiting to go to external DBMS
+
+            #Try to load the data to external DBMS:
             try:
                 testObject.InsertOrUpdateDatabase(datatoload)
             except Exception as e:
                 logging.exception(str(e.message))
                 pass
+
+            #Stop and kill the ouimeaux environment to avoid greenlet hangs:
+            testObject.startStopWemoEnvironment("stop")
+            try:
+                activitycheckfile = open("lastKnownActivity.log","w")
+                file.write(activitycheckfile,"Last known activity in ouimeaux application: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                file.close(activitycheckfile)
+            except Exception as e:
+                logging.exception("Couldn't write to activity log file: " + str(e.message))
+                raise
+
         except Exception as e:
             logging.exception("Unknown error in Python application: " + str(e.message))
-            print
+            print(e.message)
+            raise
 
     print("Ending program.  Infinite loop param: " + str(infiniteloop_param))
 

@@ -13,6 +13,7 @@ from ouimeaux.environment import Environment
 
 class LocalNetworkWemoFetcher:
 
+
     def __init__(self,config_params):
         # We will use an in-memory database & table to store and aggregate our data we've pulled from our WeMo devices
         self.dbfile = str(uuid.uuid4()) + ".db"
@@ -47,14 +48,29 @@ class LocalNetworkWemoFetcher:
                             DateDataFetched DATE
                             )'''
                         )
-        try:
-            self.wemoenvironment = Environment()
-            self.wemoenvironment.start()
-            self.wemoenvironment.discover(config_params.get("Seconds For Environment Discovery"))
-        except Exception as e:
-            logging.exception("Failed to initialize new instance of LocalNetworkWemoFetcher!  Ouimeaux environment did not start correctly!")
-            raise
         self.config = config_params
+        self.wemoenvironment = None
+        # we will construct and destruct this elsewhere
+
+    def startStopWemoEnvironment(self, startstop):
+        if startstop == "start":
+            try:
+                try:
+                    self.wemoenvironment = Environment()
+                except AttributeError:
+                    self.wemoenvironment = Environment() #Create the variable if we destroyed it elsewhere
+                self.wemoenvironment.start()
+                self.wemoenvironment.discover(self.config.get("Seconds For Environment Discovery"))
+            except Exception as e:
+                logging.exception("Failed to initialize new wemo environment! " + str(e.message))
+                raise
+        if startstop == "stop":
+            try:
+                self.wemoenvironment.upnp.server.stop()
+                self.wemoenvironment.registry.server.stop()
+                del self.wemoenvironment
+            except Exception as e:
+                logging.exception("Failed to stop and delete wemo environment! " + str(e.message))
 
     def getDeviceHardwareIDs(self, environment):
         current_switches = self.wemoenvironment.list_switches()
@@ -141,8 +157,7 @@ class LocalNetworkWemoFetcher:
                         ) VALUES (?,?,?,?,?,?,?,?,?, datetime('now'))''',
                      datatoinsert)  # This method must iterate through the list and replace the variables (?'s) in the INSERT statement from left to right
                 self.db.commit()
-                derp = 1
-            self.wemoenvironment.wait(self.config.get("Delay in Seconds When Fetching Data"))
+                self.wemoenvironment.wait(self.config.get("Delay in Seconds When Fetching Data"))
         derp = 2
 
     def aggregateusagedata(self):
@@ -390,6 +405,6 @@ class LocalNetworkWemoFetcher:
                 self.cur.execute("DELETE FROM averagedDataPoints WHERE ROWID = ?", (int(currentDataRow.get("SQLite3 - averagedDataPoints Row ID")),))
             mssqldb.close() #end of for loop per device
         except Exception as e:
-            logging.exception("ERROR IN LOADING DATABASE WITH CACHED DATA: " + str(e.message))
+            logging.warning("ERROR IN LOADING DATABASE WITH CACHED DATA: " + str(e.message))
             raise #Ideally, error handling should fill an in-memory python buffer that is flushed into the DB when the exception state clears, but this is a home project for data that has little value (unlike, say, money changing hands), so meh.
         print("Finished with MS SQL Server work!")
