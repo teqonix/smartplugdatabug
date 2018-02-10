@@ -2,11 +2,13 @@ import wemoFetchClass
 import ConfigParser
 import logging
 import datetime
+import sys
 
+workingdir = sys.argv[1]
 
 def writeRecentActivity():
     try:
-        activitycheckfile = open("lastKnownActivity.log", "w")
+        activitycheckfile = open(workingdir + "lastKnownActivity.log", "w")
         file.write(activitycheckfile,
                    "Last known activity in ouimeaux application: " + datetime.datetime.now().strftime(
                        "%Y-%m-%d %H:%M:%S"))
@@ -20,11 +22,12 @@ if __name__ == "__main__":
     print("Object oriented test of Local Wemo Fetch Project")
     print("-------------------------------------------------")
 
-    logging.basicConfig(level=logging.ERROR, filename='./wemoLinuxLog.log')
+    logging.basicConfig(level=logging.ERROR, filename= (workingdir + 'wemoLinuxLog.log'))
 
     writeRecentActivity()
     config = ConfigParser.ConfigParser()
-    config.readfp(open(r'config.cfg'))
+    configpath = (workingdir + "config.cfg")
+    config.readfp(open(configpath))
 
     infiniteloop_param = int(config.get('LOOP BREAKER', 'infiniteloop'))
 
@@ -50,7 +53,7 @@ if __name__ == "__main__":
     while infiniteloop_param == 1:
         try:
             #Check to see if the program should continue running based on the config:
-            config.readfp(open(r'config.cfg'))
+            config.readfp(open(configpath))
             infiniteloop_param = int(config.get('LOOP BREAKER', 'infiniteloop'))
             print("Infinite loop still in effect? " + str(infiniteloop_param))
 

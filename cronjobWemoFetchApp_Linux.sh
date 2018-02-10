@@ -1,7 +1,7 @@
 #!/bin/bash
 
-pythonscriptfile=testWemoClass.py
-checkModifyFile=lastKnownActivity.log
+pythonscriptfile=/teqtools/wemofetchapp/testWemoClass.py
+checkModifyFile=/teqtools/wemofetchapp/lastKnownActivity.log
 numMinutes=$1
 
 if [ -z "$numMinutes" ]
@@ -39,8 +39,9 @@ then
     #If the app isn't running, start it in the background
     if [ $ps_run_count -eq 0 ]
     then
-        python $pythonscriptfile > ./wemoCronJob.log 2>&1 &
+        /usr/bin/python $pythonscriptfile /teqtools/wemofetchapp/ > /teqtools/wemofetchapp/wemoCronJob.log 2>&1 &
         echo "Wemo app started!"
     fi
+
 
 fi
