@@ -4,14 +4,27 @@ import wemoFetchClass
 import ConfigParser
 import logging
 import datetime
+import time
+
+def writeRecentActivity():
+    try:
+        activitycheckfile = open("lastKnownActivity.log", "w")
+        file.write(activitycheckfile,
+                   "Last known activity in ouimeaux application: " + datetime.datetime.now().strftime(
+                       "%Y-%m-%d %H:%M:%S"))
+        file.close(activitycheckfile)
+    except Exception as e:
+        logging.exception("Couldn't write to activity log file: " + str(e.message))
+        raise
 
 if __name__ == "__main__":
     print("")
     print("Object oriented test of Local Wemo Fetch Project")
-    print("---------------")
+    print("-------------------------------------------------")
 
     logging.basicConfig(level=logging.ERROR, filename='./wemoLinuxLog.log')
 
+    writeRecentActivity()
     config = ConfigParser.ConfigParser()
     config.readfp(open(r'config.cfg'))
 
@@ -31,7 +44,11 @@ if __name__ == "__main__":
     #Instantiate object to do all our work:
     testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
 
-    while infiniteloop_param == 1:
+    while 1 == 1:
+        print("Endless loop!!!!!! " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        time.sleep(2)
+
+    while infiniteloop_param == 2:
         try:
             #Check to see if the program should continue running based on the config:
             config.readfp(open(r'config.cfg'))
@@ -57,13 +74,7 @@ if __name__ == "__main__":
 
             #Stop and kill the ouimeaux environment to avoid greenlet hangs:
             testObject.startStopWemoEnvironment("stop")
-            try:
-                activitycheckfile = open("lastKnownActivity.log","w")
-                file.write(activitycheckfile,"Last known activity in ouimeaux application: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                file.close(activitycheckfile)
-            except Exception as e:
-                logging.exception("Couldn't write to activity log file: " + str(e.message))
-                raise
+            writeRecentActivity()
 
         except Exception as e:
             logging.exception("Unknown error in Python application: " + str(e.message))
