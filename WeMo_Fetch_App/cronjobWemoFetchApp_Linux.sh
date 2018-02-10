@@ -10,6 +10,8 @@ then
     exit
 fi
 
+date
+
 if [ $(($numMinutes)) -gt 0 ]
 then
     echo "Is wemo app running? "

@@ -44,9 +44,10 @@ if __name__ == "__main__":
     #Instantiate object to do all our work:
     testObject = wemoFetchClass.LocalNetworkWemoFetcher(localdb_config_parameters)
 
-    while 1 == 1:
-        print("Endless loop!!!!!! " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        time.sleep(2)
+    #Used for debugging the shell script:
+    # while 1 == 1:
+    #     print("Endless loop!!!!!! " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    #     time.sleep(2)
 
     while infiniteloop_param == 2:
         try:
