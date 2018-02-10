@@ -20,7 +20,7 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
+*/1 * * * * /teqtools/wemofetchapp/cronjobWemoFetchApp_Linux.sh 5 >> /teqtools/wemofetchapp/crontab.log 2>&1
+0 4 * * 1 rm /teqtools/wemofetchapp/wemoCronJob.log
+0 4 * * 1 rm /teqtools/wemofetchapp/crontab.log
 
-#Wemo fetch app job:
-#*/3 * * * * /teqtools/wemofetchapp/cronjobWemoFetchApp_Linux.sh >> /teqtools/wemofetchapp/crontab.log 2>&1
-#0 4 * * 1 rm /teqtools/wemofetchapp/wemoCronJob.log

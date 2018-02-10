@@ -1,10 +1,8 @@
-from uu import test
-
 import wemoFetchClass
 import ConfigParser
 import logging
 import datetime
-import time
+
 
 def writeRecentActivity():
     try:
@@ -49,7 +47,7 @@ if __name__ == "__main__":
     #     print("Endless loop!!!!!! " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     #     time.sleep(2)
 
-    while infiniteloop_param == 2:
+    while infiniteloop_param == 1:
         try:
             #Check to see if the program should continue running based on the config:
             config.readfp(open(r'config.cfg'))
